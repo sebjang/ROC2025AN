@@ -1,0 +1,116 @@
+{
+  "_meta": {
+    "title": "ROC Capital Tax Analysis",
+    "version": "2.0",
+    "tax_year": 2025,
+    "data_source": "ICI 2025 PCMNT (Form 1099-DIV)",
+    "last_updated": "2025-01-01",
+    "author": "ROC Collective Petition Group",
+    "note": "Edit this file to update parameters. All calculations auto-update."
+  },
+  "params": {
+    "fx_rate": 1350,
+    "existing_income": 0,
+    "subscriber_type": "local",
+    "us_dividend_rate": 0.15,
+    "kr_target_wht": 0.14
+  },
+  "health_insurance_2025": {
+    "hi_rate": 0.0709,
+    "ltc_rate": 0.1295,
+    "combined_rate": 0.08008155,
+    "hi_monthly_cap": 3911280,
+    "ltc_monthly_cap": 506511,
+    "combined_monthly_cap": 4417791,
+    "combined_annual_cap": 53013492,
+    "source": "보건복지부고시 제2024-289호 (2025.1.1 시행)",
+    "local_rate": 0.10
+  },
+  "income_tax_brackets_2025": {
+    "source": "소득세법 §55① (2025년)",
+    "brackets": [
+      {"from": 0,          "to": 14000000,   "rate": 0.06, "deduction": 0},
+      {"from": 14000000,   "to": 50000000,   "rate": 0.14, "deduction": 1260000},
+      {"from": 50000000,   "to": 88000000,   "rate": 0.24, "deduction": 6260000},
+      {"from": 88000000,   "to": 150000000,  "rate": 0.35, "deduction": 15940000},
+      {"from": 150000000,  "to": 300000000,  "rate": 0.38, "deduction": 20440000},
+      {"from": 300000000,  "to": 500000000,  "rate": 0.40, "deduction": 25440000},
+      {"from": 500000000,  "to": 1000000000, "rate": 0.42, "deduction": 35440000},
+      {"from": 1000000000, "to": null,        "rate": 0.45, "deduction": 72340000}
+    ]
+  },
+  "ici_2025_pcmnt": {
+    "source": "ICI 2025 PCMNT — Form 1099-DIV Box별 확정값 (구주 기준)",
+    "etfs": {
+      "TSLY": {
+        "name": "YieldMax TSLA Option Income Strategy ETF",
+        "cusip": "88636X880",
+        "nav_hist": 14.23,
+        "ps_total": 8.773002,
+        "box1a": 2.371405,
+        "box2c": 0.000000,
+        "box3_roc": 6.401597,
+        "roc_pct": 72.9693,
+        "reverse_split": "1:5 (2025-12-01)",
+        "color": "#D85A30"
+      },
+      "NVDY": {
+        "name": "YieldMax NVDA Option Income Strategy ETF",
+        "cusip": "88634T774",
+        "nav_hist": 23.90,
+        "ps_total": 12.141500,
+        "box1a": 5.749295,
+        "box2c": 0.000000,
+        "box3_roc": 6.392205,
+        "roc_pct": 52.6476,
+        "reverse_split": "없음",
+        "color": "#185FA5"
+      },
+      "CONY": {
+        "name": "YieldMax COIN Option Income Strategy ETF",
+        "cusip": "88636X856",
+        "nav_hist": 13.46,
+        "ps_total": 9.830900,
+        "box1a": 0.291348,
+        "box2c": 0.001815,
+        "box3_roc": 9.537737,
+        "roc_pct": 97.0179,
+        "reverse_split": "1:10 (2025-12-02)",
+        "color": "#BA7517",
+        "note": "Box2c(Collectibles 28% Gain)=$0.001815 포함"
+      },
+      "MSTY": {
+        "name": "YieldMax MSTR Option Income Strategy ETF",
+        "cusip": "88636X732",
+        "nav_hist": 30.69,
+        "ps_total": 18.627800,
+        "box1a": 0.000000,
+        "box2c": 0.000000,
+        "box3_roc": 18.627800,
+        "roc_pct": 100.0000,
+        "reverse_split": "1:5 (2025-12-08)",
+        "color": "#A32D2D"
+      },
+      "PLTY": {
+        "name": "YieldMax PLTR Option Income Strategy ETF",
+        "cusip": "88636R800",
+        "nav_hist": 70.45,
+        "ps_total": 57.963000,
+        "box1a": 57.608074,
+        "box2c": 0.000000,
+        "box3_roc": 0.354926,
+        "roc_pct": 0.6123,
+        "reverse_split": "없음",
+        "color": "#534AB7"
+      }
+    }
+  },
+  "investment_scales": [100000000, 300000000, 500000000, 1000000000],
+  "export_companies": [
+    {"name": "삼성전자", "op_rate": 8.1},
+    {"name": "현대차",   "op_rate": 8.9},
+    {"name": "POSCO",    "op_rate": 3.8},
+    {"name": "LG전자",   "op_rate": 3.2},
+    {"name": "수출기업 평균", "op_rate": 4.5}
+  ]
+}
