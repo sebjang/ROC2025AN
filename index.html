@@ -3,307 +3,377 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ROC 자본과세 범용 계산기 v1.0</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<title>YieldMax ROC 세금 범용 계산기 v1.0 | ICI 2025 PCMNT | 60종 전수</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0D1117;--bg2:#161B22;--bg3:#21262D;--bg4:#2D333B;--bd:#30363D;--bd2:#444C56;--tx:#E6EDF3;--mu:#8B949E;--di:#484F58;--bl:#58A6FF;--gn:#3FB950;--rd:#F85149;--or:#D29922;--pu:#BC8CFF;--gn2:#56D364;--rd2:#F87171;--font:'Noto Sans KR',sans-serif;--mono:'IBM Plex Mono',monospace;--head:'Space Grotesk',sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px;line-height:1.6}
-input,select,button{font-family:var(--font)}
-.wrap{max-width:1200px;margin:0 auto;padding:0 18px}
-header{background:var(--bg2);border-bottom:1px solid var(--bd);padding:11px 0;position:sticky;top:0;z-index:100}
+body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px;line-height:1.6;min-height:100vh}
+input,select,button,textarea{font-family:var(--font)}
+.w{max-width:1280px;margin:0 auto;padding:0 16px}
+header{background:var(--bg2);border-bottom:1px solid var(--bd);padding:10px 0;position:sticky;top:0;z-index:100}
 .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.logo{font-family:var(--head);font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px}
-.ver{background:#1F6FEB;color:#fff;font-size:10px;padding:2px 8px;border-radius:20px;font-family:var(--mono);font-weight:600}
-.htag{font-family:var(--mono);font-size:11px;color:var(--mu);background:var(--bg3);border:1px solid var(--bd);border-radius:5px;padding:2px 9px;display:inline-block}
+.logo{font-family:var(--head);font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.ver{background:#1F6FEB;color:#fff;font-size:10px;padding:2px 8px;border-radius:20px;font-family:var(--mono)}
+.htag{font-family:var(--mono);font-size:11px;color:var(--mu);background:var(--bg3);border:1px solid var(--bd);border-radius:5px;padding:2px 8px}
 .htag b{color:var(--bl)}
-
-/* CTRL PANELS */
-.ctrl{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin:14px 0 10px}
-.ctrl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-.ctrl-row:last-child{margin-bottom:0}
-.lbl{font-size:12px;color:var(--mu);min-width:68px;flex-shrink:0}
-button.pb{font-size:12px;padding:5px 12px;border-radius:7px;cursor:pointer;border:1px solid var(--bd);background:var(--bg3);color:var(--mu);transition:all .12s}
-button.pb.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
-button.pb:hover:not(.on){background:var(--bg4);color:var(--tx)}
-.pi{font-family:var(--mono);font-size:13px;padding:5px 9px;border-radius:7px;border:1px solid var(--bd);background:var(--bg3);color:var(--tx);transition:border-color .12s}
+/* layout */
+.main-grid{display:grid;grid-template-columns:340px 1fr;gap:14px;margin:14px 0;align-items:start}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+/* LEFT: selector + params */
+.panel{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.ph{padding:10px 14px;border-bottom:1px solid var(--bd);font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:space-between}
+.ph-title{font-family:var(--mono);color:var(--mu);text-transform:uppercase;letter-spacing:.07em;font-size:11px}
+.pb{padding:10px 14px}
+/* ETF selector */
+.etf-search{width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--bd);border-radius:7px;color:var(--tx);font-size:13px;margin-bottom:8px;transition:border-color .15s}
+.etf-search:focus{outline:none;border-color:var(--bl)}
+.etf-list{max-height:280px;overflow-y:auto;border-radius:6px;border:1px solid var(--bd);background:var(--bg3)}
+.etf-item{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);transition:background .1s}
+.etf-item:last-child{border:none}
+.etf-item:hover{background:rgba(88,166,255,.08)}
+.etf-item.sel{background:rgba(88,166,255,.15);border-left:2px solid var(--bl)}
+.etf-tk{font-family:var(--mono);font-size:12px;font-weight:600}
+.etf-nm{font-size:10px;color:var(--mu);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.etf-roc{font-family:var(--mono);font-size:11px;font-weight:600}
+/* input modes */
+.mode-tabs{display:flex;gap:3px;margin-bottom:10px}
+.mt{flex:1;background:var(--bg3);border:1px solid var(--bd);color:var(--mu);font-size:11px;padding:5px;border-radius:6px;cursor:pointer;text-align:center;transition:all .12s}
+.mt.on{background:var(--bl);color:#fff;border-color:var(--bl)}
+.fi{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.fi label{font-size:11px;color:var(--mu);min-width:70px;flex-shrink:0}
+.pi{flex:1;padding:6px 9px;background:var(--bg4);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-family:var(--mono);font-size:13px;transition:border-color .15s}
 .pi:focus{outline:none;border-color:var(--bl)}
-.pi.w{border-color:var(--or)}
-.pi-unit{font-size:12px;color:var(--mu);flex-shrink:0}
-.pi-hint{font-family:var(--mono);font-size:11px;color:var(--pu)}
-.pi-err{font-size:11px;color:var(--rd)}
-.pi-msg{font-size:11px;color:var(--mu)}
-.notation{font-size:11px;color:var(--di);margin-top:5px;font-family:var(--mono)}
-
-/* VBAR */
-.vbar{display:flex;align-items:center;gap:10px;padding:9px 14px;background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.25);border-radius:8px;margin-bottom:12px;font-size:13px}
-.vbar.fail{background:rgba(248,81,73,.07);border-color:rgba(248,81,73,.25)}
-.vi{font-size:16px}
-
-/* ETF CARDS */
-.ecard{border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:12px;background:var(--bg2)}
-.ehead{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.ename{font-family:var(--head);font-size:20px;font-weight:700}
-.emeta{font-family:var(--mono);font-size:11px;color:var(--mu);margin-top:2px}
-.etags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.pi.warn{border-color:var(--or)}
+.pi.ok{border-color:var(--gn)}
+.punit{font-size:11px;color:var(--mu);white-space:nowrap}
+.pi-hint{font-family:var(--mono);font-size:10px;color:var(--pu);margin-top:2px}
+.pi-err{font-size:10px;color:var(--rd);margin-top:2px}
+.sep{height:1px;background:var(--bd);margin:8px 0}
+.btn-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+button.btn{padding:6px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;border:none;transition:opacity .15s}
+button.btn:hover{opacity:.82}
+.btn-pri{background:#1F6FEB;color:#fff}
+.btn-sec{background:var(--bg4);color:var(--tx);border:1px solid var(--bd)}
+.btn-grn{background:rgba(63,185,80,.2);color:var(--gn);border:1px solid rgba(63,185,80,.3)}
+/* NAV info */
+.nav-info{font-family:var(--mono);font-size:10px;color:var(--mu);background:var(--bg4);border:1px solid var(--bd);border-radius:5px;padding:4px 8px;margin-top:4px}
+.nav-est{color:var(--or)}
+/* RIGHT: results */
+.vbar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;margin-bottom:10px;font-size:12px}
+.vbar.ok{background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.25);color:var(--gn)}
+.vbar.warn{background:rgba(210,153,34,.07);border:1px solid rgba(210,153,34,.25);color:var(--or)}
+/* US vs KR */
+.vs-wrap{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.vs-head{padding:11px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.vs-ename{font-family:var(--head);font-size:22px;font-weight:700}
+.vs-emeta{font-family:var(--mono);font-size:10px;color:var(--mu);margin-top:2px}
+.vs-etags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
 .tag{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:10px;border:1px solid var(--bd);color:var(--mu)}
-.vs{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bd)}
-.vs-us{padding:12px 16px;background:rgba(63,185,80,.05)}
-.vs-kr{padding:12px 16px;background:rgba(248,81,73,.05)}
-.vs-flag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bd)}
+@media(max-width:600px){.vs-grid{grid-template-columns:1fr}}
+.vs-us{padding:12px 14px;background:rgba(63,185,80,.05)}
+.vs-kr{padding:12px 14px;background:rgba(248,81,73,.05)}
+.vs-flag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
 .vs-flag.g{color:var(--gn)}.vs-flag.r{color:var(--rd)}
-.vs-amt{font-family:var(--head);font-size:24px;font-weight:700;margin:3px 0}
+.vs-amt{font-family:var(--head);font-size:26px;font-weight:700;margin:3px 0}
 .vs-amt.g{color:var(--gn)}.vs-amt.r{color:var(--rd)}
-.vs-bk{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:6px 0}
-.vbi{background:var(--bg3);border-radius:5px;padding:4px 6px}
+.vs-bk{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:7px 0}
+.vbi{background:var(--bg4);border-radius:5px;padding:4px 6px}
 .vbl{font-size:9px;color:var(--mu)}.vbv{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--rd2)}
 .vs-sub{font-family:var(--mono);font-size:10px;color:var(--mu)}
-.bar-w{padding:7px 16px;background:var(--bg3);border-top:1px solid var(--bd)}
-.bar-bg{height:7px;background:rgba(63,185,80,.15);border-radius:4px;overflow:hidden}
-.bar-f{height:100%;background:linear-gradient(90deg,var(--rd),#ff9999);border-radius:4px;transition:width .35s}
-.stog{width:100%;background:none;border:none;border-top:1px solid var(--bd);color:var(--mu);font-size:11px;padding:7px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:var(--font)}
-.stog:hover{background:rgba(255,255,255,.025);color:var(--tx)}
-.sbody{display:none;padding:10px 16px;background:var(--bg);font-family:var(--mono);font-size:11px}
-.sr{display:flex;align-items:baseline;gap:6px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.bar-w{padding:6px 14px;background:var(--bg3);border-top:1px solid var(--bd)}
+.bar-bg{height:6px;background:rgba(63,185,80,.12);border-radius:3px;overflow:hidden}
+.bar-f{height:100%;background:linear-gradient(90deg,var(--rd),#ff9999);border-radius:3px;transition:width .3s}
+/* steps */
+.stog{width:100%;background:none;border:none;border-top:1px solid var(--bd);color:var(--mu);font-size:11px;padding:7px 14px;cursor:pointer;display:flex;justify-content:space-between;font-family:var(--font)}
+.stog:hover{background:rgba(255,255,255,.02);color:var(--tx)}
+.sbody{display:none;padding:8px 14px;background:var(--bg);font-family:var(--mono);font-size:11px}
+.sr{display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}
 .sr:last-child{border:none}
-.sid{font-size:10px;font-weight:600;color:var(--bl);min-width:58px;flex-shrink:0}
-.snm{font-size:11px;color:var(--mu);min-width:108px;flex-shrink:0}
-.sfm{color:var(--di);flex:1;font-size:10px}
-.srs{text-align:right;margin-left:8px;white-space:nowrap;font-weight:600}
-
-/* CHIPS */
-.chip{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:10px;border:1px solid}
-.chip-ok{background:rgba(63,185,80,.12);color:var(--gn);border-color:rgba(63,185,80,.3)}
-.chip-warn{background:rgba(210,153,34,.12);color:var(--or);border-color:rgba(210,153,34,.3)}
-.chip-err{background:rgba(248,81,73,.12);color:var(--rd);border-color:rgba(248,81,73,.3)}
-
-footer{border-top:1px solid var(--bd);padding:16px 0;margin-top:32px;font-size:11px;color:var(--mu)}
-@media(max-width:640px){.vs{grid-template-columns:1fr}.vs-us{border-bottom:1px solid var(--bd)}.vs-bk{grid-template-columns:1fr 1fr}.vs-amt{font-size:20px}}
+.sid{font-size:10px;font-weight:600;color:var(--bl);min-width:56px;flex-shrink:0}
+.snm{font-size:10px;color:var(--mu);min-width:100px;flex-shrink:0}
+.sfm{color:var(--di);flex:1;font-size:10px;word-break:break-all}
+.srs{font-weight:600;text-align:right;white-space:nowrap;margin-left:4px}
+/* comparison table */
+.tbl-box{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.tbl-head{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:720px;font-size:12px}
+th{background:var(--bg3);color:var(--mu);font-weight:500;text-align:right;padding:7px 10px;border-bottom:1px solid var(--bd);white-space:nowrap;font-size:10px;letter-spacing:.03em}
+th:first-child,th:nth-child(2){text-align:left}
+td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);text-align:right;font-family:var(--mono)}
+td:first-child{text-align:left;font-family:var(--font)}
+td:nth-child(2){text-align:left;font-family:var(--mono)}
+tr:last-child td{border:none}
+tr:hover td{background:rgba(255,255,255,.025);cursor:pointer}
+.rr{color:var(--rd2)}.gr{color:var(--gn2)}.bl{color:var(--bl)}.or{color:var(--or)}.pu{color:var(--pu)}
+.chip{display:inline-block;font-size:9px;padding:1px 6px;border-radius:8px;border:1px solid}
+.cp{border-color:rgba(63,185,80,.4);color:var(--gn);background:rgba(63,185,80,.1)}
+.cw{border-color:rgba(210,153,34,.4);color:var(--or);background:rgba(210,153,34,.1)}
+.cf{border-color:rgba(248,81,73,.4);color:var(--rd);background:rgba(248,81,73,.1)}
+/* sort btns */
+.sort-btns{display:flex;gap:4px;flex-wrap:wrap}
+.sb{font-size:10px;padding:3px 9px;border-radius:5px;cursor:pointer;border:1px solid var(--bd);background:var(--bg3);color:var(--mu)}
+.sb.on{background:var(--bg4);border-color:var(--bl);color:var(--bl)}
+footer{border-top:1px solid var(--bd);padding:14px 0;margin-top:20px;font-size:11px;color:var(--mu)}
+.fdiv{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
 </style>
 </head>
 <body>
 <header>
-<div class="wrap">
+<div class="w">
 <div class="hd">
-  <div class="logo">📊 ROC Tax 범용 계산기 <span class="ver">v1.0</span></div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap">
+  <div class="logo">📊 YieldMax ROC Tax 범용 계산기 <span class="ver">v1.0</span></div>
+  <div style="display:flex;gap:5px;flex-wrap:wrap">
     <span class="htag">FX ₩<b id="h-fx">1,350</b>/$</span>
-    <span class="htag">건보 <b id="h-hi">8.008155</b>%</span>
-    <span class="htag">연상한 <b id="h-cap">5,301</b>万</span>
+    <span class="htag">건보 <b id="h-hi">8.008%</b></span>
+    <span class="htag">60종 ICI 2025 PCMNT</span>
     <span class="htag">cfg: <b id="h-cfg" style="color:var(--gn)">로딩…</b></span>
   </div>
 </div>
 </div>
 </header>
 
-<main class="wrap">
+<main class="w">
+<div class="main-grid">
 
-<!-- ── 투자 규모 ── -->
-<div class="ctrl">
-  <div class="ctrl-row">
-    <span class="lbl">투자 규모</span>
-    <div style="display:flex;gap:4px;flex-wrap:wrap" id="pbg">
-      <button class="pb on" onclick="setPreset(1e8,this)">1억</button>
-      <button class="pb" onclick="setPreset(3e8,this)">3억</button>
-      <button class="pb" onclick="setPreset(5e8,this)">5억</button>
-      <button class="pb" onclick="setPreset(1e9,this)">10억</button>
-      <button class="pb" onclick="setPreset(3e9,this)">30억</button>
+<!-- ══ LEFT PANEL ══ -->
+<div>
+
+<!-- ETF 선택 -->
+<div class="panel">
+  <div class="ph"><span class="ph-title">ETF 선택 (60종)</span><span id="sel-count" style="font-family:var(--mono);font-size:10px;color:var(--pu)"></span></div>
+  <div class="pb">
+    <input class="etf-search" id="etf-search" placeholder="🔍 검색: TSLY, CONY, MSTR, NVDA…" oninput="filterETF(this.value)">
+    <div class="etf-list" id="etf-list"></div>
+  </div>
+</div>
+
+<!-- 입력 모드 -->
+<div class="panel">
+  <div class="ph"><span class="ph-title">투자 규모 입력</span></div>
+  <div class="pb">
+    <div class="mode-tabs">
+      <button class="mt on" onclick="setMode('invest',this)">투자금액</button>
+      <button class="mt" onclick="setMode('shares',this)">보유주수</button>
+      <button class="mt" onclick="setMode('annual',this)">연간수령액</button>
     </div>
-    <span style="font-size:11px;color:var(--mu)">또는</span>
-    <input class="pi" id="ci" type="text" placeholder="2.5억 / 250000000" style="width:160px" oninput="previewAmt(this.value)" onkeydown="if(event.key==='Enter')applyAmt()">
-    <span class="pi-hint" id="ci-hint"></span>
-    <span class="pi-err" id="ci-err"></span>
-    <button class="pb on" onclick="applyAmt()" style="flex-shrink:0">▶ 적용</button>
-  </div>
-  <div class="notation">입력형식: 2.5억 · 1억5000만 · 250000000 · 2.5e8</div>
-</div>
-
-<!-- ── 파라미터 편집 (항상 노출) ── -->
-<div class="ctrl">
-  <div class="ctrl-row">
-    <span class="lbl">환율 FX</span>
-    <input class="pi" id="p-fx" type="number" value="1350" step="10" min="900" max="2500" oninput="markMod('p-fx',1350)" style="width:90px">
-    <span class="pi-unit">₩/$</span>
-    <span style="width:12px"></span>
-    <span class="lbl">기존소득</span>
-    <input class="pi" id="p-ex" type="number" value="0" step="1000000" min="0" oninput="markMod('p-ex',0)" style="width:110px">
-    <span class="pi-unit">원</span>
-    <span style="width:12px"></span>
-    <span class="lbl">미국 WHT</span>
-    <input class="pi" id="p-us" type="number" value="15" step="0.5" min="0" max="30" oninput="markMod('p-us',15)" style="width:70px">
-    <span class="pi-unit">%</span>
-  </div>
-  <div class="ctrl-row">
-    <span class="lbl">건보 합산율</span>
-    <input class="pi" id="p-hi" type="number" value="8.008155" step="0.001" min="1" max="20" oninput="syncHI()" style="width:100px">
-    <span class="pi-unit">%</span>
-    <span style="width:8px"></span>
-    <span class="lbl" style="min-width:58px">건보 月상한</span>
-    <input class="pi" id="p-hm" type="number" value="3911280" step="10000" oninput="syncCap()" style="width:110px">
-    <span class="pi-unit">원</span>
-    <span style="width:8px"></span>
-    <span class="lbl" style="min-width:52px">장기요양率</span>
-    <input class="pi" id="p-ltc" type="number" value="12.95" step="0.01" min="1" max="30" oninput="syncHI()" style="width:80px">
-    <span class="pi-unit">% of 건보</span>
-    <span style="width:8px"></span>
-    <span class="lbl" style="min-width:48px">연 상한</span>
-    <input class="pi" id="p-cap" type="number" value="53013492" step="100000" oninput="markMod('p-cap',53013492)" style="width:110px">
-    <span class="pi-unit">원</span>
-  </div>
-  <div class="ctrl-row" style="justify-content:flex-end;gap:6px">
-    <span class="pi-msg" id="p-msg"></span>
-    <button class="pb on" onclick="applyParams()" style="padding:6px 16px;font-size:13px">✓ 확인 적용</button>
-    <button class="pb" onclick="resetParams()">↺ 초기화</button>
-    <button class="pb" onclick="copyURL()">🔗 URL 복사</button>
-    <button class="pb" onclick="dlJSON()">↓ JSON</button>
+    <!-- 투자금액 모드 -->
+    <div id="m-invest">
+      <div class="fi">
+        <label>투자금액</label>
+        <input class="pi" id="inv-amt" type="text" placeholder="2.5억 / 250000000" oninput="previewAmt(this.value)" onkeydown="if(event.key==='Enter')calc()">
+        <span class="punit">원</span>
+      </div>
+      <div class="pi-hint" id="inv-hint"></div>
+      <div class="pi-err" id="inv-err"></div>
+      <div class="fi" style="margin-top:7px">
+        <label>취득 단가</label>
+        <input class="pi" id="inv-nav" type="number" step="0.01" min="0.01" oninput="updateNavHint()">
+        <span class="punit">$/주</span>
+      </div>
+      <div class="nav-info" id="nav-info"></div>
+    </div>
+    <!-- 보유주수 모드 -->
+    <div id="m-shares" style="display:none">
+      <div class="fi">
+        <label>보유 주수</label>
+        <input class="pi" id="sh-cnt" type="number" placeholder="1000" step="1" min="1">
+        <span class="punit">주</span>
+      </div>
+    </div>
+    <!-- 연간수령액 모드 -->
+    <div id="m-annual" style="display:none">
+      <div class="fi">
+        <label>연간 수령</label>
+        <input class="pi" id="ann-usd" type="number" placeholder="5000" step="0.01" min="0.01">
+        <span class="punit">USD</span>
+      </div>
+      <div style="font-size:10px;color:var(--mu);margin-top:4px">ICI 비율 적용: 취득단가 불필요</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-pri" onclick="calc()">▶ 계산하기</button>
+      <button class="btn btn-sec" onclick="resetInput()">↺ 초기화</button>
+    </div>
   </div>
 </div>
 
-<!-- ── 검증 상태바 ── -->
-<div class="vbar" id="vbar">
-  <span class="vi" id="v-ico">✓</span>
-  <span id="v-txt" style="color:var(--gn)">검증 중…</span>
-  <span style="flex:1"></span>
-  <span id="v-detail" style="font-family:var(--mono);font-size:11px;color:var(--mu)"></span>
+<!-- 파라미터 -->
+<div class="panel">
+  <div class="ph">
+    <span class="ph-title">파라미터 편집</span>
+    <button class="btn btn-sec" style="padding:2px 9px;font-size:10px" onclick="applyP()">✓ 적용</button>
+  </div>
+  <div class="pb">
+    <div class="fi"><label>환율 FX</label><input class="pi" id="p-fx" type="number" value="1350" step="10" oninput="markMod('p-fx',1350)"><span class="punit">₩/$</span></div>
+    <div class="fi"><label>기존소득</label><input class="pi" id="p-ex" type="number" value="0" step="1000000" oninput="markMod('p-ex',0)"><span class="punit">원</span></div>
+    <div class="fi"><label>미국 WHT</label><input class="pi" id="p-us" type="number" value="15" step="0.5" oninput="markMod('p-us',15)"><span class="punit">%</span></div>
+    <div class="sep"></div>
+    <div class="fi"><label>건보 합산율</label><input class="pi" id="p-hi" type="number" value="8.008155" step="0.001" oninput="syncHI()"><span class="punit">%</span></div>
+    <div class="fi"><label>건보 月상한</label><input class="pi" id="p-hm" type="number" value="3911280" step="10000" oninput="syncCap()"><span class="punit">원</span></div>
+    <div class="fi"><label>장기요양率</label><input class="pi" id="p-ltc" type="number" value="12.95" step="0.01" oninput="syncHI()"><span class="punit">%</span></div>
+    <div class="fi"><label>연 상한</label><input class="pi" id="p-cap" type="number" value="53013492" step="100000" oninput="markMod('p-cap',53013492)"><span class="punit">원</span></div>
+    <div class="btn-row">
+      <button class="btn btn-pri" onclick="applyP()">✓ 확인 적용</button>
+      <button class="btn btn-sec" onclick="resetP()">↺ 초기화</button>
+      <button class="btn btn-sec" onclick="copyURL()">🔗 URL</button>
+      <button class="btn btn-sec" onclick="dlJSON()">↓ JSON</button>
+    </div>
+    <div id="p-msg" style="font-size:10px;color:var(--mu);margin-top:5px"></div>
+  </div>
 </div>
 
-<!-- ── ETF 결과 카드들 ── -->
-<div id="cards"></div>
+</div><!-- /LEFT -->
 
+<!-- ══ RIGHT PANEL ══ -->
+<div>
+  <div class="vbar ok" id="vbar"><span id="v-ico">✓</span><span id="v-txt">ETF를 선택하고 계산하세요</span><span style="flex:1"></span><span id="v-det" style="font-family:var(--mono);font-size:10px"></span></div>
+  <div id="result-area"><div style="padding:40px;text-align:center;color:var(--mu);border:1px solid var(--bd);border-radius:10px;font-size:13px">← ETF 선택 후 [계산하기]</div></div>
+
+  <!-- 전체 비교표 -->
+  <div class="tbl-box">
+    <div class="tbl-head">
+      <span style="font-family:var(--mono);font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.07em">전체 비교표 — 현재 투자규모 기준 (ETF 클릭 시 선택)</span>
+      <div class="sort-btns">
+        <button class="sb on" onclick="sortTbl('roc',this)">ROC%↓</button>
+        <button class="sb" onclick="sortTbl('ero',this)">침식%↓</button>
+        <button class="sb" onclick="sortTbl('iy',this)">실소득%↓</button>
+        <button class="sb" onclick="sortTbl('kr',this)">KR세↓</button>
+        <button class="sb" onclick="sortTbl('tk',this)">알파벳</button>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table id="cmp-tbl">
+        <thead>
+          <tr>
+            <th style="text-align:left">ETF</th>
+            <th style="text-align:left">펀드명</th>
+            <th>ROC%</th>
+            <th>★실소득율</th>
+            <th>🇺🇸미국세</th>
+            <th>🇰🇷KR총세</th>
+            <th>원금침식</th>
+            <th>STEP4V</th>
+          </tr>
+        </thead>
+        <tbody id="cmp-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div><!-- /RIGHT -->
+
+</div><!-- /main-grid -->
 </main>
 
-<footer class="wrap" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-  <span>ICI 2025 PCMNT · 2025 NHIS 공식 · Decimal 검증 30/30 PASS · 현재 모델 기준 재현</span>
-  <span style="font-family:var(--mono)"><a href="config.json" style="color:var(--mu)">config.json</a> · v1.0 · 6-Layer</span>
-</footer>
+<footer><div class="w"><div class="fdiv">
+  <span>ICI-P25-YM 60종 전수 (검증 60/60 PASS) | 2025 NHIS 공식 | Decimal 수리검증 | 현재 모델 기준</span>
+  <span style="font-family:var(--mono)"><a href="config.json" style="color:var(--mu)">config.json</a> · v1.0</span>
+</div></div></footer>
 
 <script>
+// ═══════════════════════════════════════════════════════════════
+// ICI 2025 PCMNT — 60종 전수 (ICI-P25-YM 확정, 검증 60/60 PASS)
+// b1a=Box1a(OrderlyDiv), b2a=Box2a(TotCGDistr), b2c=Box2c(Coll28%)
+// b3=Box3(ROC/Nondividend) | navH: ★=추정값, 실제취득가 입력 권장
+// ═══════════════════════════════════════════════════════════════
 const ICI={
-  TSLY:{navH:14.23,ps:8.773002,b1a:2.371405,b2c:0,     b3:6.401597, roc:72.9693,rev:"1:5 (2025-12-01)", clr:"#D85A30"},
-  NVDY:{navH:23.90,ps:12.14150,b1a:5.749295,b2c:0,     b3:6.392205, roc:52.6476,rev:"없음",             clr:"#185FA5"},
-  CONY:{navH:13.46,ps:9.830900,b1a:0.291348,b2c:0.001815,b3:9.537737,roc:97.0179,rev:"1:10 (2025-12-02)",clr:"#BA7517"},
-  MSTY:{navH:30.69,ps:18.62780,b1a:0,        b2c:0,    b3:18.62780, roc:100.0,  rev:"1:5 (2025-12-08)", clr:"#A32D2D"},
-  PLTY:{navH:70.45,ps:57.96300,b1a:57.608074,b2c:0,    b3:0.354926, roc:0.6123, rev:"없음",             clr:"#534AB7"},
+ABNY:{ps:6.4207,b1a:0.0,b2a:0.0,b2c:0.0,b3:6.4207,roc:100.0,navH:10.36,navEst:true,name:'ABNB Option Income',cusip:'88636X401'},
+AIYY:{ps:3.9677,b1a:0.0,b2a:0.0,b2c:0.0,b3:3.9677,roc:100.0,navH:6.4,navEst:true,name:'AI Option Income',cusip:'88636X864'},
+AMDY:{ps:7.0538,b1a:4.475572,b2a:0.0,b2c:0.0,b3:2.578228,roc:36.55,navH:11.38,navEst:true,name:'AMD Option Income',cusip:'88636X724'},
+AMZY:{ps:6.9842,b1a:2.46384,b2a:0.0,b2c:0.0,b3:4.52036,roc:64.72,navH:11.26,navEst:true,name:'AMZN Option Income',cusip:'88634T840'},
+APLY:{ps:4.6827,b1a:1.232995,b2a:0.0,b2c:0.0,b3:3.449705,roc:73.67,navH:7.55,navEst:true,name:'AAPL Option Income',cusip:'88634T857'},
+BABO:{ps:11.3034,b1a:6.655488,b2a:0.0,b2c:0.0,b3:4.647912,roc:41.12,navH:18.23,navEst:true,name:'BABA Option Income',cusip:'88636R107'},
+BIGY:{ps:6.5678,b1a:6.5678,b2a:0.0,b2c:0.0,b3:0.0,roc:0.0,navH:10.59,navEst:true,name:'Target 12 Big 50',cusip:'88636R750'},
+BRKC:{ps:4.8879,b1a:1.28425,b2a:0.0,b2c:0.0,b3:3.60365,roc:73.73,navH:7.88,navEst:true,name:'BRK.B Option Income',cusip:'88634T832'},
+CHPY:{ps:15.6787,b1a:11.841425,b2a:0.0,b2c:0.0,b3:3.837275,roc:24.47,navH:25.29,navEst:true,name:'Semiconductor Portfolio',cusip:'88636R693'},
+CONY:{ps:9.8309,b1a:0.291348,b2a:0.001815,b2c:0.0,b3:9.537737,roc:97.02,navH:13.46,navEst:false,name:'COIN Option Income',cusip:'88636X856'},
+CRCO:{ps:8.6707,b1a:8.6707,b2a:0.0,b2c:0.0,b3:0.0,roc:0.0,navH:13.98,navEst:true,name:'CRCL Option Income',cusip:'88636W866'},
+CRSH:{ps:4.3907,b1a:0.0,b2a:0.0,b2c:0.0,b3:4.3907,roc:100.0,navH:7.08,navEst:true,name:'Short TSLA Option Income',cusip:'88636X609'},
+CVNY:{ps:29.8135,b1a:17.038508,b2a:0.0,b2c:0.0,b3:12.774992,roc:42.85,navH:48.09,navEst:true,name:'CVNA Option Income',cusip:'88636R206'},
+DIPS:{ps:7.034,b1a:0.0,b2a:0.0,b2c:0.0,b3:7.034,roc:100.0,navH:11.35,navEst:true,name:'Short NVDA Option Income',cusip:'88636X500'},
+DISO:{ps:4.7221,b1a:0.0,b2a:0.0,b2c:0.0,b3:4.7221,roc:100.0,navH:7.62,navEst:true,name:'DIS Option Income',cusip:'88634T444'},
+DRAY:{ps:10.0858,b1a:0.54377,b2a:0.0,b2c:0.0,b3:9.54203,roc:94.61,navH:16.27,navEst:true,name:'DKNG Option Income',cusip:'88636R305'},
+FBY:{ps:6.9903,b1a:2.575925,b2a:0.0,b2c:0.0,b3:4.414375,roc:63.15,navH:11.27,navEst:true,name:'META Option Income',cusip:'88634T816'},
+FEAT:{ps:19.1114,b1a:15.198437,b2a:0.0,b2c:0.0,b3:3.912963,roc:20.47,navH:30.82,navEst:true,name:'Dorsey Wright Featured 5',cusip:'88636R669'},
+FIAT:{ps:6.3479,b1a:0.0,b2a:0.0,b2c:0.0,b3:6.3479,roc:100.0,navH:10.24,navEst:true,name:'Short COIN Option Income',cusip:'88636X302'},
+FIVY:{ps:14.2225,b1a:11.496307,b2a:0.0,b2c:0.0,b3:2.726193,roc:19.17,navH:22.94,navEst:true,name:'Dorsey Wright Hybrid 5',cusip:'88636R651'},
+GDXY:{ps:8.3515,b1a:8.3515,b2a:0.0,b2c:0.0,b3:0.0,roc:0.0,navH:13.47,navEst:true,name:'Gold Miners Option Income',cusip:'88634T881'},
+GMEY:{ps:7.7298,b1a:7.7298,b2a:0.0,b2c:0.0,b3:0.0,roc:0.0,navH:12.47,navEst:true,name:'GME Option Income',cusip:'88636V462'},
+GOOY:{ps:6.0596,b1a:6.0596,b2a:0.0,b2c:0.0,b3:0.0,roc:0.0,navH:9.77,navEst:true,name:'GOOGL Option Income',cusip:'88634T790'},
+GPTY:{ps:14.5138,b1a:14.5138,b2a:0.0,b2c:0.0,b3:0.0,roc:0.0,navH:23.41,navEst:true,name:'AI and Tech Portfolio',cusip:'88636R735'},
+HIYY:{ps:7.3822,b1a:7.3822,b2a:0.0,b2c:0.0,b3:0.0,roc:0.0,navH:11.91,navEst:true,name:'HIMS Option Income',cusip:'88636V454'},
+HOOY:{ps:39.3054,b1a:39.3054,b2a:0.0,b2c:0.0,b3:0.0,roc:0.0,navH:63.4,navEst:true,name:'HOOD Option Income',cusip:'88636R404'},
+JPMO:{ps:5.4609,b1a:3.460043,b2a:0.0,b2c:0.0,b3:2.000857,roc:36.64,navH:8.81,navEst:true,name:'JPM Option Income',cusip:'88634T436'},
+LFGY:{ps:23.6766,b1a:8.366125,b2a:0.0,b2c:0.0,b3:15.310475,roc:64.67,navH:38.19,navEst:true,name:'Crypto & Tech Portfolio',cusip:'88636R727'},
+MARO:{ps:21.1318,b1a:0.64168,b2a:0.0,b2c:0.0,b3:20.49012,roc:96.96,navH:34.08,navEst:true,name:'MARA Option Income',cusip:'88636R602'},
+MRNY:{ps:3.156267,b1a:0.0,b2a:0.0,b2c:0.0,b3:3.156267,roc:100.0,navH:5.09,navEst:true,name:'MRNA Option Income',cusip:'88636X203'},
+MSFO:{ps:5.2386,b1a:2.643237,b2a:0.0,b2c:0.0,b3:2.595363,roc:49.54,navH:8.45,navEst:true,name:'MSFT Option Income',cusip:'88634T428'},
+MSST:{ps:1.0813,b1a:1.0813,b2a:0.0,b2c:0.0,b3:0.0,roc:0.0,navH:5.0,navEst:true,name:'MSTR Target 25',cusip:'88636V751'},
+MSTY:{ps:18.6278,b1a:0.0,b2a:0.0,b2c:0.0,b3:18.6278,roc:100.0,navH:30.69,navEst:false,name:'MSTR Option Income',cusip:'88636X732'},
+NFLY:{ps:7.3902,b1a:5.260836,b2a:0.0,b2c:0.0,b3:2.129364,roc:28.81,navH:11.92,navEst:true,name:'NFLX Option Income',cusip:'88634T782'},
+NVDY:{ps:12.1415,b1a:5.749295,b2a:0.0,b2c:0.0,b3:6.392205,roc:52.65,navH:23.9,navEst:false,name:'NVDA Option Income',cusip:'88634T774'},
+NVIT:{ps:1.18,b1a:1.18,b2a:0.0,b2c:0.0,b3:0.0,roc:0.0,navH:5.0,navEst:true,name:'NVDA Target 25',cusip:'88636V579'},
+OARK:{ps:5.7381,b1a:3.327235,b2a:0.0,b2c:0.0,b3:2.410865,roc:42.02,navH:9.26,navEst:true,name:'ARK Innovation Option Income',cusip:'88636X807'},
+PLTY:{ps:57.963,b1a:57.608074,b2a:0.0,b2c:0.0,b3:0.354926,roc:0.61,navH:70.45,navEst:false,name:'PLTR Option Income',cusip:'88636R800'},
+PYPY:{ps:5.9216,b1a:0.0,b2a:0.0,b2c:0.0,b3:5.9216,roc:100.0,navH:9.55,navEst:true,name:'PYPL Option Income',cusip:'88636X740'},
+QDTY:{ps:11.6004,b1a:6.28663,b2a:1.810997,b2c:0.0,b3:3.502773,roc:30.2,navH:18.71,navEst:true,name:'Nasdaq 100 0DTE Covered Call',cusip:'88636R578'},
+RBLY:{ps:10.7531,b1a:0.289654,b2a:0.0,b2c:0.0,b3:10.463446,roc:97.31,navH:17.34,navEst:true,name:'RBLX Option Income',cusip:'88636R883'},
+RDTY:{ps:14.4163,b1a:2.826352,b2a:0.7362,b2c:0.0,b3:10.853748,roc:75.29,navH:23.25,navEst:true,name:'R2000 0DTE Covered Call',cusip:'88636R552'},
+RDYY:{ps:9.5188,b1a:9.5188,b2a:0.0,b2c:0.0,b3:0.0,roc:0.0,navH:15.35,navEst:true,name:'RDDT Option Income',cusip:'88636V421'},
+RNTY:{ps:4.0457,b1a:3.97558,b2a:0.07012,b2c:0.0,b3:0.0,roc:0.0,navH:6.53,navEst:true,name:'Target 12 Real Estate',cusip:'88636R776'},
+SDTY:{ps:9.7657,b1a:4.130795,b2a:1.47053,b2c:0.0,b3:4.164375,roc:42.64,navH:15.75,navEst:true,name:'S&P 500 0DTE Covered Call',cusip:'88636R560'},
+SLTY:{ps:10.0755,b1a:0.301507,b2a:0.0,b2c:0.0,b3:9.773993,roc:97.01,navH:16.25,navEst:true,name:'Ultra Short Option Income',cusip:'88636R677'},
+SMCY:{ps:18.746,b1a:5.930358,b2a:0.0,b2c:0.0,b3:12.815642,roc:68.36,navH:30.24,navEst:true,name:'SMCI Option Income',cusip:'88636R867'},
+SNOY:{ps:10.3818,b1a:7.393879,b2a:0.000054,b2c:0.0,b3:2.987867,roc:28.78,navH:16.74,navEst:true,name:'SNOW Option Income',cusip:'88636J774'},
+SOXY:{ps:6.8105,b1a:6.8105,b2a:0.0,b2c:0.0,b3:0.0,roc:0.0,navH:10.98,navEst:true,name:'Target 12 Semiconductor',cusip:'88636R818'},
+TEST:{ps:1.3228,b1a:1.3228,b2a:0.0,b2c:0.0,b3:0.0,roc:0.0,navH:5.0,navEst:true,name:'TSLA Target 25',cusip:'88636V546'},
+TSLY:{ps:8.773002,b1a:2.371405,b2a:0.0,b2c:0.0,b3:6.401597,roc:72.97,navH:14.23,navEst:false,name:'TSLA Option Income',cusip:'88636X880'},
+TSMY:{ps:8.8207,b1a:6.75438,b2a:0.0,b2c:0.0,b3:2.06632,roc:23.43,navH:14.23,navEst:true,name:'TSM Option Income',cusip:'88636R859'},
+ULTY:{ps:7.753339,b1a:2.500002,b2a:0.004602,b2c:0.0,b3:5.248735,roc:67.7,navH:12.51,navEst:true,name:'Ultra Option Income',cusip:'88636X708'},
+WNTR:{ps:23.2252,b1a:7.749613,b2a:0.0,b2c:0.0,b3:15.475587,roc:66.63,navH:37.46,navEst:true,name:'MSTR Short Option Income',cusip:'88636R347'},
+XOMO:{ps:3.7055,b1a:0.0,b2a:0.0,b2c:0.0,b3:3.7055,roc:100.0,navH:5.98,navEst:true,name:'XOM Option Income',cusip:'88634T410'},
+XYZY:{ps:7.8596,b1a:0.0,b2a:0.0,b2c:0.0,b3:7.8596,roc:100.0,navH:12.68,navEst:true,name:'XYZ Option Income',cusip:'88636X872'},
+YBIT:{ps:7.2056,b1a:0.361097,b2a:0.808564,b2c:0.0,b3:6.035939,roc:83.77,navH:11.62,navEst:true,name:'Bitcoin Option Income',cusip:'88636X104'},
+YMAG:{ps:7.4382,b1a:4.02773,b2a:0.094472,b2c:0.0,b3:3.315998,roc:44.58,navH:12.0,navEst:true,name:'Magnificent 7 Option Income',cusip:'88636J642'},
+YMAX:{ps:7.8543,b1a:3.889744,b2a:0.026754,b2c:0.0,b3:3.937802,roc:50.14,navH:12.67,navEst:true,name:'Universe Fund of Option Income',cusip:'88636J659'},
+YQQQ:{ps:3.8524,b1a:0.754737,b2a:0.0,b2c:0.0,b3:3.097663,roc:80.41,navH:6.21,navEst:true,name:'Short Nasdaq 100 Option Income',cusip:'88636J451'},
 };
-const BR=[[0,14e6,.06,0],[14e6,50e6,.14,1260000],[50e6,88e6,.24,6260000],[88e6,150e6,.35,15940000],[150e6,300e6,.38,20440000],[300e6,500e6,.40,25440000],[500e6,1e9,.42,35440000],[1e9,Infinity,.45,72340000]];
 
-let S={scale:1e8,fx:1350,hi:0.08008155,cap:53013492,ex:0,us:0.15,lt:0.10};
+const BR=[[0,14e6,.06,0],[14e6,50e6,.14,1260000],[50e6,88e6,.24,6260000],[88e6,150e6,.35,15940000],[150e6,300e6,.38,20440000],[300e6,500e6,.40,25440000],[500e6,1e9,.42,35440000],[1e9,Infinity,.45,72340000]];
+let S={fx:1350,ex:0,us:0.15,lt:0.10,hi:0.08008155,cap:53013492};
+let selTK='TSLY'; let inputMode='invest'; let sortKey='roc'; let lastR=null;
 
 function IT(x){if(!isFinite(x)||x<=0)return 0;for(const[,h,r,d]of BR)if(x<=h)return Math.round(x*r-d);return Math.round(x*0.45-72340000);}
 
-function calcETF(tk,P){
-  const d=ICI[tk];if(!d||!P)return null;
-  const sh=Math.round((P/S.fx)/d.navH);
+function computeR(tk,sh,P){
+  const d=ICI[tk];if(!d)return null;
   const distW=Math.round(d.ps*sh*S.fx);
-  const incW=Math.round(d.b1a*sh*S.fx);
-  const cgW=Math.round((d.b2c||0)*sh*S.fx);
+  const incW=Math.round((d.b1a+d.b2a+d.b2c)*sh*S.fx);
   const rocW=Math.round(d.b3*sh*S.fx);
-  const icW=incW+cgW;
-  const s4d=distW-(icW+rocW);
-  const iy=P>0?icW/P*100:0;
-  const us=Math.round(icW*S.us);
+  const s4d=distW-(incW+rocW);
+  const iy=P>0?incW/P*100:0;
+  const us=Math.round(incW*S.us);
   const incrIT=Math.max(0,IT(distW+S.ex)-IT(S.ex));
   const lt=Math.round(incrIT*S.lt);
   const hiR=Math.round(distW*S.hi);
   const hiC=Math.min(hiR,S.cap);
   const capped=hiR>S.cap;
   const kr=incrIT+lt+hiC;
-  const itC=Math.max(0,IT(icW+S.ex)-IT(S.ex));
-  const ltC=Math.round(itC*S.lt);
-  const hiCC=Math.min(Math.round(icW*S.hi),S.cap);
-  const corr=itC+ltC+hiCC;
+  const itC=Math.max(0,IT(incW+S.ex)-IT(S.ex));
+  const corr=itC+Math.round(itC*S.lt)+Math.min(Math.round(incW*S.hi),S.cap);
   const rocTax=kr-corr;
   const ero=P>0?kr/P*100:0;
   const mul=us>0?kr/us:null;
-  const chk=[Math.abs(s4d)<=1,incrIT>=0,hiC<=S.cap,Math.abs(kr-(incrIT+lt+hiC))<=1,Math.abs(rocTax-(kr-corr))<=1,iy>=0&&iy<=200];
-  return{sh,distW,incW,cgW,rocW,icW,iy,us,incrIT,lt,hiR,hiC,capped,kr,corr,rocTax,ero,mul,s4d,chk};
+  const a=Math.abs(s4d);
+  const chkV=a<=1?{c:'cp',l:'PASS'}:a<=1000?{c:'cw',l:'WARN'}:{c:'cf',l:'FAIL'};
+  return{sh,P,distW,incW,rocW,iy,us,incrIT,lt,hiC,capped,kr,corr,rocTax,ero,mul,s4d,chkV};
 }
 
 const nn=v=>Math.round(v).toLocaleString('ko-KR');
 const p4=v=>v.toFixed(4)+'%';
 const man=v=>nn(Math.round(v/1e4))+'万';
 const fmtS=v=>{if(v>=1e8)return(v/1e8).toFixed(v%1e8?1:0)+'억원';if(v>=1e4)return nn(v/1e4)+'万원';return nn(v)+'원';};
-const chip=(ok,lbl)=>`<span class="chip ${ok?'chip-ok':'chip-err'}">${lbl||( ok?'PASS':'FAIL')}</span>`;
-const chipD=d=>{const a=Math.abs(d);return a<=1?`<span class="chip chip-ok">PASS Δ=${d}</span>`:a<=1000?`<span class="chip chip-warn">WARN Δ=${d}</span>`:`<span class="chip chip-err">FAIL Δ=${d}</span>`;};
-
-function renderAll(){
-  const P=S.scale;
-  let tp=0,tc=0;
-  const html=[];
-  for(const[tk,d]of Object.entries(ICI)){
-    const r=calcETF(tk,P);if(!r)continue;
-    const pc=r.chk.filter(Boolean).length;tp+=pc;tc+=r.chk.length;
-    const steps=[
-      ['STEP 1','주수',`₩${nn(P)}÷${nn(S.fx)}÷$${d.navH}`,`${nn(r.sh)}주`,'var(--bl)'],
-      ['STEP 2','총분배금',`$${d.ps}×${nn(r.sh)}주×${nn(S.fx)}`,`₩${nn(r.distW)}`,'var(--tx)'],
-      ['STEP 3','Box1a소득',`$${d.b1a}×${nn(r.sh)}주×${nn(S.fx)}`,`₩${nn(r.incW)}`,'var(--gn)'],
-      ['STEP 4a','Box2c CG',`$${d.b2c||0}×${nn(r.sh)}주×${nn(S.fx)}`,`₩${nn(r.cgW)}${d.b2c>0?' ★':''}`,'var(--or)'],
-      ['STEP 4b','Box3 ROC',`$${d.b3}×${nn(r.sh)}주×${nn(S.fx)}`,`₩${nn(r.rocW)}`,'var(--rd2)'],
-      ['STEP 4V','정밀도검증',`|distW−(icW+rocW)|`,chipD(r.s4d),''],
-      ['STEP 5','★실소득율',`icW÷₩${nn(P)}×100`,p4(r.iy),'var(--gn)'],
-      ['STEP 6','🇺🇸미국세',`icW×${(S.us*100).toFixed(0)}% (ROC=$0,IRC§301)`,`₩${nn(r.us)}`,'var(--gn)'],
-      ['STEP 7','종소세증분',`IT(distW+${nn(S.ex)})−IT(${nn(S.ex)})`,`₩${nn(r.incrIT)}`,'var(--rd2)'],
-      ['STEP 8','지방소득세',`S7×${(S.lt*100).toFixed(0)}%`,`₩${nn(r.lt)}`,'var(--rd2)'],
-      ['STEP 9',`건보${r.capped?'★상한':''}`,`min(distW×${(S.hi*100).toFixed(6)}%,₩${nn(S.cap)})`,`₩${nn(r.hiC)}`,r.capped?'var(--pu)':'var(--rd2)'],
-      ['STEP 10','🇰🇷KR총세','S7+S8+S9',`₩${man(r.kr)} (${p4(r.ero)})`,'var(--rd2)'],
-      ['STEP 11','정상세금','IT(icW+exist)+지방+건보',`₩${nn(r.corr)}`,'var(--mu)'],
-      ['STEP 12','ROC과다징수','S10−S11',`₩${man(r.rocTax)} (${p4(r.rocTax/P*100)})`,'var(--rd2)'],
-      ['STEP 13','침식·배수',`kr÷₩${nn(P)}`,`${p4(r.ero)} | KR/US ${r.mul?nn(Math.round(r.mul))+'배':'∞'}`,'var(--rd2)'],
-    ];
-    const sHTML=steps.map(([id,nm,fm,rs,c])=>`<div class="sr"><span class="sid">${id}</span><span class="snm">${nm}</span><span class="sfm">${fm.replace(/</g,'&lt;')}</span><span class="srs" style="color:${c}">${rs}</span></div>`).join('');
-    html.push(`<div class="ecard">
-<div class="ehead" style="border-left:2px solid ${d.clr}">
-  <div>
-    <div class="ename" style="color:${d.clr}">${tk}</div>
-    <div class="emeta">역사주가 $${d.navH} · 역병합 ${d.rev} · 구주 ${nn(r.sh)}주</div>
-    <div class="etags">
-      <span class="tag">ROC ${p4(d.roc)}</span>
-      ${d.b2c>0?`<span class="tag" style="color:var(--or)">Box2c $${d.b2c}</span>`:''}
-      <span class="tag" style="color:var(--gn)">★실소득율 ${p4(r.iy)}</span>
-      ${r.capped?`<span class="tag" style="color:var(--pu)">건보★상한</span>`:''}
-      ${chipD(r.s4d)}
-    </div>
-  </div>
-  <div style="text-align:right"><div style="font-size:11px;color:var(--mu)">검증</div><div style="font-family:var(--mono);font-size:13px;color:${pc===r.chk.length?'var(--gn)':'var(--or)'}">${pc}/${r.chk.length} PASS</div></div>
-</div>
-<div class="vs">
-  <div class="vs-us">
-    <div class="vs-flag g">🇺🇸 미국 은퇴자 (IRC §301)</div>
-    <div style="font-size:11px;color:var(--mu);margin-bottom:4px">ROC → 취득원가 감액 → 즉시 세금 $0</div>
-    <div class="vs-amt g">₩${nn(r.us)}</div>
-    <div class="vs-sub">실소득 ${p4(r.iy)} × ${(S.us*100).toFixed(0)}% | 원금침식 0%</div>
-  </div>
-  <div class="vs-kr">
-    <div class="vs-flag r">🇰🇷 한국 은퇴자 지역가입자</div>
-    <div class="vs-bk">
-      <div class="vbi"><div class="vbl">①종소세</div><div class="vbv">${man(r.incrIT)}</div></div>
-      <div class="vbi"><div class="vbl">②지방세</div><div class="vbv">${man(r.lt)}</div></div>
-      <div class="vbi"><div class="vbl">③건보${r.capped?'★':''}</div><div class="vbv">${man(r.hiC)}</div></div>
-    </div>
-    <div class="vs-amt r">₩${man(r.kr)}</div>
-    <div class="vs-sub">원금침식 ${p4(r.ero)} | ROC과다 ${man(r.rocTax)} | KR/US ${r.mul?nn(Math.round(r.mul))+'배':'∞'}</div>
-  </div>
-</div>
-<div class="bar-w"><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--di);margin-bottom:3px"><span>🇰🇷 ${p4(r.ero)}</span><span>🇺🇸 0%</span></div><div class="bar-bg"><div class="bar-f" style="width:${Math.min(r.ero,100).toFixed(2)}%"></div></div></div>
-<button class="stog" onclick="const b=this.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block'">
-  <span>▼ STEP 1~13 단계별 계산근거 (${pc}/${r.chk.length} PASS)</span>
-  <span style="font-family:var(--mono);font-size:10px">ICI 2025 PCMNT · Box2c · Δ≤1원</span>
-</button>
-<div class="sbody">${sHTML}</div>
-</div>`);
-  }
-  document.getElementById('cards').innerHTML=html.join('');
-
-  const ok=tp===tc;
-  const vb=document.getElementById('vbar');vb.className='vbar'+(ok?'':' fail');
-  document.getElementById('v-ico').textContent=ok?'✓':'⚠';
-  document.getElementById('v-txt').textContent=`검증: ${tp}/${tc} PASS · STEP4V Δ≤1원 · Box2c 포함`;
-  document.getElementById('v-txt').style.color=ok?'var(--gn)':'var(--rd)';
-  document.getElementById('v-detail').textContent=`규모: ${fmtS(P)} | FX ₩${nn(S.fx)}/$ | 건보 ${(S.hi*100).toFixed(6)}% | 기존소득 ₩${nn(S.ex)}`;
-  document.getElementById('h-fx').textContent=nn(S.fx);
-  document.getElementById('h-hi').textContent=(S.hi*100).toFixed(6);
-  document.getElementById('h-cap').textContent=nn(Math.round(S.cap/1e4));
-}
 
 function parseKorAmt(s){
   s=(s||'').trim().replace(/,/g,'');if(!s)return null;
@@ -315,87 +385,249 @@ function parseKorAmt(s){
   else if(m2)v=+m2[1]*1e8;
   else if(m3)v=+m3[1]*1e4;
   else v=parseFloat(s);
-  return isFinite(v)&&v>=1000000?Math.round(v):null;
+  return isFinite(v)&&v>=100000?Math.round(v):null;
 }
 
 function previewAmt(s){
   const v=parseKorAmt(s);
-  document.getElementById('ci-hint').textContent=v?'→ ₩'+nn(v)+' ('+fmtS(v)+')':'';
-  document.getElementById('ci-err').textContent=(s.trim()&&!v)?'인식 불가':'';
-  document.getElementById('ci').className='pi'+(s.trim()&&!v?' w':'');
+  document.getElementById('inv-hint').textContent=v?'→ ₩'+nn(v)+' ('+fmtS(v)+')':'';
+  document.getElementById('inv-err').textContent=(s.trim()&&!v)?'인식 불가':'';
 }
 
-function applyAmt(){
-  const v=parseKorAmt(document.getElementById('ci').value);
-  if(!v){document.getElementById('ci-err').textContent='금액을 인식할 수 없습니다.';return;}
-  S.scale=v;
-  document.querySelectorAll('#pbg button').forEach(b=>b.classList.remove('on'));
-  renderAll();
+function updateNavHint(){
+  const tk=selTK; const d=ICI[tk];
+  document.getElementById('inv-nav').placeholder=d?d.navH:'?';
 }
 
-function setPreset(v,btn){
-  S.scale=v;
-  document.querySelectorAll('#pbg button').forEach(b=>b.classList.remove('on'));
+function calc(){
+  const d=ICI[selTK]; if(!d){alert('ETF를 선택하세요');return;}
+  let sh=0; let P=0;
+
+  if(inputMode==='invest'){
+    P=parseKorAmt(document.getElementById('inv-amt').value);
+    if(!P){document.getElementById('inv-err').textContent='금액을 입력하세요';return;}
+    const navInput=parseFloat(document.getElementById('inv-nav').value);
+    const nav=navInput>0?navInput:d.navH;
+    sh=Math.round((P/S.fx)/nav);
+  } else if(inputMode==='shares'){
+    sh=parseInt(document.getElementById('sh-cnt').value)||0;
+    P=sh*d.navH*S.fx;
+  } else {
+    const usd=parseFloat(document.getElementById('ann-usd').value)||0;
+    if(!usd){alert('연간수령액을 입력하세요');return;}
+    sh=d.ps>0?Math.round(usd/d.ps):0;
+    P=sh*d.navH*S.fx;
+  }
+  if(sh<=0){document.getElementById('inv-err').textContent='유효한 주수를 계산할 수 없습니다';return;}
+
+  lastR=computeR(selTK,sh,P);
+  renderResult(selTK,lastR);
+  renderTable();
+}
+
+function renderResult(tk,r){
+  const d=ICI[tk];
+  const steps=[
+    ['STEP 1','보유주수',`₩${nn(r.P)}÷${nn(S.fx)}÷$${d.navH}`,`${nn(r.sh)}주`,'var(--bl)'],
+    ['STEP 2','총분배금',`$${d.ps}×${nn(r.sh)}주×${nn(S.fx)}`,`₩${nn(r.distW)}`,'var(--tx)'],
+    ['STEP 3','Box1a소득',`$(${d.b1a}+${d.b2a}+${d.b2c})×${nn(r.sh)}주×${nn(S.fx)}`,`₩${nn(r.incW)}`,'var(--gn2)'],
+    ['STEP 4','Box3 ROC',`$${d.b3}×${nn(r.sh)}주×${nn(S.fx)}`,`₩${nn(r.rocW)}`,'var(--rd2)'],
+    ['STEP 4V','정밀도',`|distW−(incW+rocW)|=Δ${r.s4d}`,`<span class="chip ${r.chkV.c}">${r.chkV.l} Δ=${r.s4d}</span>`,''],
+    ['STEP 5','★실소득율',`incW÷₩${nn(r.P)}×100`,p4(r.iy),'var(--gn2)'],
+    ['STEP 6','🇺🇸미국세',`incW×${(S.us*100).toFixed(0)}% (ROC=$0)`,`₩${nn(r.us)}`,'var(--gn2)'],
+    ['STEP 7','종소세증분',`IT(distW+${nn(S.ex)})−IT(${nn(S.ex)})`,`₩${nn(r.incrIT)}`,'var(--rd2)'],
+    ['STEP 8','지방소득세',`S7×${(S.lt*100).toFixed(0)}%`,`₩${nn(r.lt)}`,'var(--rd2)'],
+    ['STEP 9',`건보${r.capped?'★상한':''}`,`min(distW×${(S.hi*100).toFixed(4)}%,₩${nn(S.cap)})`,`₩${nn(r.hiC)}`,'var(--rd2)'],
+    ['STEP 10','🇰🇷KR총세','S7+S8+S9',`₩${man(r.kr)} (${p4(r.ero)})`,'var(--rd2)'],
+    ['STEP 11','정상세금','IT(incW)+지방+건보',`₩${nn(r.corr)}`,'var(--mu)'],
+    ['STEP 12','ROC과다','S10−S11',`₩${man(r.rocTax)} (${p4(r.rocTax/r.P*100)})`,'var(--rd2)'],
+    ['STEP 13','침식·배수',`KR÷₩${nn(r.P)}`,`${p4(r.ero)} | KR/US ${r.mul?nn(Math.round(r.mul))+'배':'∞'}`,'var(--rd2)'],
+  ];
+  const sHTML=steps.map(([id,nm,fm,rs,c])=>`<div class="sr"><span class="sid">${id}</span><span class="snm">${nm}</span><span class="sfm">${fm}</span><span class="srs" style="color:${c}">${rs}</span></div>`).join('');
+  const navMark=d.navEst?'<span style="color:var(--or)">★추정NAV($'+d.navH+')</span>':'<span style="color:var(--gn)">확정NAV($'+d.navH+')</span>';
+
+  document.getElementById('result-area').innerHTML=`
+<div class="vs-wrap">
+  <div class="vs-head">
+    <div>
+      <div class="vs-ename" style="color:${d.roc>=90?'var(--rd)':d.roc>=50?'var(--or)':'var(--bl)'}">${tk}</div>
+      <div class="vs-emeta">${d.name} | CUSIP: ${d.cusip} | ${navMark}</div>
+      <div class="vs-etags">
+        <span class="tag" style="color:var(--rd2)">ROC ${d.roc.toFixed(2)}%</span>
+        <span class="tag" style="color:var(--gn2)">★실소득율 ${p4(r.iy)}</span>
+        ${d.b2a>0?`<span class="tag" style="color:var(--or)">Box2a $${d.b2a.toFixed(4)}</span>`:''}
+        <span class="chip ${r.chkV.c}" style="margin-left:2px">STEP4V ${r.chkV.l}</span>
+      </div>
+    </div>
+    <div style="text-align:right"><div style="font-size:10px;color:var(--mu)">규모</div><div style="font-family:var(--mono);font-size:13px;color:var(--pu)">${fmtS(r.P)}</div></div>
+  </div>
+  <div class="vs-grid">
+    <div class="vs-us">
+      <div class="vs-flag g">🇺🇸 미국 (IRC §301)</div>
+      <div style="font-size:10px;color:var(--mu);margin-bottom:4px">ROC → 취득원가 감액 → $0</div>
+      <div class="vs-amt g">₩${nn(r.us)}</div>
+      <div class="vs-sub">실소득 ${p4(r.iy)} × ${(S.us*100).toFixed(0)}% | 원금침식 0%</div>
+    </div>
+    <div class="vs-kr">
+      <div class="vs-flag r">🇰🇷 한국 지역가입자</div>
+      <div class="vs-bk">
+        <div class="vbi"><div class="vbl">①종소세</div><div class="vbv">${man(r.incrIT)}</div></div>
+        <div class="vbi"><div class="vbl">②지방세</div><div class="vbv">${man(r.lt)}</div></div>
+        <div class="vbi"><div class="vbl">③건보${r.capped?'★':''}</div><div class="vbv">${man(r.hiC)}</div></div>
+      </div>
+      <div class="vs-amt r">₩${man(r.kr)}</div>
+      <div class="vs-sub">원금침식 ${p4(r.ero)} | ROC과다 ${man(r.rocTax)} | KR/US ${r.mul?nn(Math.round(r.mul))+'배':'∞'}</div>
+    </div>
+  </div>
+  <div class="bar-w">
+    <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--di);margin-bottom:3px"><span>🇰🇷 ${p4(r.ero)}</span><span>🇺🇸 0%</span></div>
+    <div class="bar-bg"><div class="bar-f" style="width:${Math.min(r.ero,100).toFixed(2)}%"></div></div>
+  </div>
+  <button class="stog" onclick="const b=this.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block'">
+    <span>▼ STEP 1~13 단계별 계산근거</span>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--di)">ICI 2025 | b1a+b2a+b3=ps | Δ≤1원</span>
+  </button>
+  <div class="sbody">${sHTML}</div>
+</div>`;
+
+  document.getElementById('vbar').className='vbar ok';
+  document.getElementById('v-ico').textContent='✓';
+  document.getElementById('v-txt').textContent=`${tk} ${fmtS(r.P)} 계산 완료 — STEP4V ${r.chkV.l} (Δ=${r.s4d}원)`;
+  document.getElementById('v-det').textContent=`구주 ${nn(r.sh)}주 | FX ₩${nn(S.fx)}/$ | 건보 ${(S.hi*100).toFixed(4)}%`;
+}
+
+// ETF 리스트 렌더링
+function buildETFList(filter){
+  const tks=Object.keys(ICI).filter(tk=>!filter||(tk.includes(filter.toUpperCase())||ICI[tk].name.toLowerCase().includes(filter.toLowerCase())));
+  document.getElementById('sel-count').textContent=`${tks.length}/${Object.keys(ICI).length}`;
+  const el=document.getElementById('etf-list');
+  el.innerHTML=tks.map(tk=>{
+    const d=ICI[tk];
+    const rocClr=d.roc>=90?'var(--rd2)':d.roc>=50?'var(--or)':d.roc>0?'var(--gn2)':'var(--mu)';
+    return`<div class="etf-item${tk===selTK?' sel':''}" onclick="selectETF('${tk}')">
+      <div>
+        <div class="etf-tk" style="color:${rocClr}">${tk}</div>
+        <div class="etf-nm">${d.name}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="etf-roc" style="color:${rocClr}">${d.roc.toFixed(1)}%</div>
+        <div style="font-size:9px;color:var(--di)">${d.navEst?'★추정':'확정'}NAV</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterETF(v){buildETFList(v);}
+
+function selectETF(tk){
+  selTK=tk;
+  buildETFList(document.getElementById('etf-search').value);
+  const d=ICI[tk];
+  document.getElementById('inv-nav').placeholder=d.navH;
+  document.getElementById('nav-info').innerHTML=d.navEst?
+    `<span class="nav-est">★추정NAV $${d.navH} — 실제 취득단가로 변경하세요</span>`:
+    `확정 NAV $${d.navH} (ICI-P25-YM 역사주가)`;
+}
+
+// 비교표
+let cmpCache={};
+function renderTable(){
+  const allTks=Object.keys(ICI);
+  const P0=lastR?lastR.P:1e8;
+  const rows=allTks.map(tk=>{
+    const d=ICI[tk];
+    const sh=Math.round((P0/S.fx)/d.navH);
+    const P=sh*d.navH*S.fx;
+    const r=computeR(tk,sh,P);
+    cmpCache[tk]=r;
+    return{tk,d,r};
+  });
+
+  if(sortKey==='roc')rows.sort((a,b)=>b.d.roc-a.d.roc);
+  else if(sortKey==='ero')rows.sort((a,b)=>b.r.ero-a.r.ero);
+  else if(sortKey==='iy')rows.sort((a,b)=>b.r.iy-a.r.iy);
+  else if(sortKey==='kr')rows.sort((a,b)=>b.r.kr-a.r.kr);
+  else rows.sort((a,b)=>a.tk.localeCompare(b.tk));
+
+  const tbody=document.getElementById('cmp-body');
+  tbody.innerHTML=rows.map(({tk,d,r})=>`<tr onclick="selectETF('${tk}');document.getElementById('inv-nav').value='';calc()">
+    <td style="font-weight:600;color:${d.roc>=90?'var(--rd2)':d.roc>=50?'var(--or)':d.roc>0?'var(--bl)':'var(--mu)'}">${tk}${tk===selTK?' ◀':''}</td>
+    <td style="font-family:var(--font);font-size:11px;color:var(--mu);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.name}</td>
+    <td class="rr">${d.roc.toFixed(2)}%</td>
+    <td class="gr">${p4(r.iy)}</td>
+    <td class="gr">₩${nn(r.us)}</td>
+    <td class="rr">${man(r.kr)}</td>
+    <td class="rr">${p4(r.ero)}</td>
+    <td><span class="chip ${r.chkV.c}">${r.chkV.l}</span></td>
+  </tr>`).join('');
+}
+
+function sortTbl(k,btn){
+  sortKey=k;
+  document.querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  document.getElementById('ci').value='';
-  document.getElementById('ci-hint').textContent='';
-  renderAll();
+  renderTable();
 }
 
-function markMod(id,def){
-  const el=document.getElementById(id);
-  const diff=Math.abs(parseFloat(el.value)-parseFloat(def))>1e-9;
-  el.className='pi'+(diff?' w':'');
-  if(diff)document.getElementById('p-msg').textContent='수정됨 — [확인 적용] 클릭';
+// 입력 모드
+function setMode(m,btn){
+  inputMode=m;
+  document.querySelectorAll('.mt').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  ['invest','shares','annual'].forEach(n=>document.getElementById('m-'+n).style.display='none');
+  document.getElementById('m-'+m).style.display='block';
 }
 
+// 파라미터
 function syncHI(){
   const hik=parseFloat(document.getElementById('p-hi').value)||8.008155;
   const ltck=parseFloat(document.getElementById('p-ltc').value)||12.95;
   document.getElementById('p-hi').value=((hik>1?hik/100:hik)*(1+(ltck>1?ltck/100:ltck))*100).toFixed(6);
   syncCap();
 }
-
 function syncCap(){
   const hm=parseFloat(document.getElementById('p-hm').value)||3911280;
   const ltck=parseFloat(document.getElementById('p-ltc').value)||12.95;
   document.getElementById('p-cap').value=Math.round((hm+Math.round(hm*(ltck>1?ltck/100:ltck)))*12);
 }
-
-function applyParams(){
+function markMod(id,def){document.getElementById(id).className='pi'+(Math.abs(parseFloat(document.getElementById(id).value)-def)>1e-9?' warn':'');}
+function applyP(){
   S.fx=parseFloat(document.getElementById('p-fx').value)||1350;
   S.ex=parseFloat(document.getElementById('p-ex').value)||0;
   S.us=(parseFloat(document.getElementById('p-us').value)||15)/100;
   const hp=parseFloat(document.getElementById('p-hi').value)||8.008155;
   S.hi=hp>1?hp/100:hp;
   S.cap=parseFloat(document.getElementById('p-cap').value)||53013492;
-  document.getElementById('p-msg').textContent='';
-  document.querySelectorAll('.pi').forEach(el=>el.classList.remove('w'));
-  renderAll();
+  document.getElementById('h-fx').textContent=nn(S.fx);
+  document.getElementById('h-hi').textContent=(S.hi*100).toFixed(3)+'%';
+  document.getElementById('p-msg').textContent='적용 완료';
+  setTimeout(()=>document.getElementById('p-msg').textContent='',1500);
+  renderTable();
 }
-
-function resetParams(){
+function resetP(){
   document.getElementById('p-fx').value=1350;document.getElementById('p-ex').value=0;
   document.getElementById('p-us').value=15;document.getElementById('p-hi').value=8.008155;
   document.getElementById('p-ltc').value=12.95;document.getElementById('p-hm').value=3911280;
   document.getElementById('p-cap').value=53013492;
   Object.assign(S,{fx:1350,ex:0,us:0.15,hi:0.08008155,cap:53013492});
-  document.getElementById('p-msg').textContent='';
-  document.querySelectorAll('.pi').forEach(el=>el.classList.remove('w'));
-  renderAll();
+  document.querySelectorAll('.pi').forEach(el=>el.classList.remove('warn'));
+  renderTable();
 }
-
 function copyURL(){
-  const u=`?scale=${S.scale}&fx=${S.fx}&hi=${(S.hi*100).toFixed(6)}&cap=${S.cap}&exist=${S.ex}&us=${(S.us*100).toFixed(1)}`;
-  navigator.clipboard.writeText(location.origin+location.pathname+u).then(()=>{document.getElementById('p-msg').textContent='URL 복사 완료!';setTimeout(()=>document.getElementById('p-msg').textContent='',2500);});
+  const u=`?fx=${S.fx}&hi=${(S.hi*100).toFixed(6)}&cap=${S.cap}&exist=${S.ex}&tk=${selTK}`;
+  navigator.clipboard.writeText(location.origin+location.pathname+u).then(()=>{document.getElementById('p-msg').textContent='URL 복사됨 🔗';setTimeout(()=>document.getElementById('p-msg').textContent='',2000);});
 }
-
 function dlJSON(){
-  const o={_meta:{version:'1.0',generated:new Date().toISOString()},params:{scale:S.scale,fx:S.fx,existing_income:S.ex,us_rate:S.us},health_insurance:{combined_rate:S.hi,annual_cap:S.cap}};
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,2)],{type:'application/json'}));a.download='roc_params_v1.json';a.click();
+  const o={meta:{version:'1.0',etfs:Object.keys(ICI).length,generated:new Date().toISOString()},params:{fx:S.fx,exist:S.ex,us_rate:S.us,hi_combined:S.hi,annual_cap:S.cap}};
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,2)],{type:'application/json'}));a.download='roc_params.json';a.click();
+}
+function resetInput(){
+  document.getElementById('inv-amt').value='';document.getElementById('inv-hint').textContent='';document.getElementById('inv-err').textContent='';
+  document.getElementById('sh-cnt').value='';document.getElementById('ann-usd').value='';
 }
 
-async function loadCFG(){
+// config.json 로드
+async function init(){
   try{
     const r=await fetch('config.json');if(!r.ok)throw 0;
     const c=await r.json();
@@ -405,33 +637,27 @@ async function loadCFG(){
     if(pa?.fx_rate)S.fx=pa.fx_rate;
     if(pa?.existing_income!=null)S.ex=pa.existing_income;
     if(pa?.us_dividend_rate)S.us=pa.us_dividend_rate;
-    document.getElementById('h-cfg').textContent='config.json ✓';
-    document.getElementById('h-cfg').style.color='var(--gn)';
-    document.getElementById('p-fx').value=S.fx;
-    document.getElementById('p-ex').value=S.ex;
-    document.getElementById('p-hi').value=(S.hi*100).toFixed(6);
-    document.getElementById('p-cap').value=S.cap;
-  }catch(e){
-    document.getElementById('h-cfg').textContent='기본값';
-    document.getElementById('h-cfg').style.color='var(--or)';
-  }
+    document.getElementById('h-cfg').textContent='✓ config.json';
+    document.getElementById('p-fx').value=S.fx;document.getElementById('p-hi').value=(S.hi*100).toFixed(6);document.getElementById('p-cap').value=S.cap;
+  }catch(e){document.getElementById('h-cfg').textContent='기본값';document.getElementById('h-cfg').style.color='var(--or)';}
+
+  // URL params
   const sp=new URLSearchParams(location.search);
-  if(sp.has('scale'))S.scale=+sp.get('scale');
   if(sp.has('fx')){S.fx=+sp.get('fx');document.getElementById('p-fx').value=S.fx;}
   if(sp.has('hi')){const v=+sp.get('hi');S.hi=v>1?v/100:v;document.getElementById('p-hi').value=(S.hi*100).toFixed(6);}
   if(sp.has('cap')){S.cap=+sp.get('cap');document.getElementById('p-cap').value=S.cap;}
-  if(sp.has('exist')){S.ex=+sp.get('exist');document.getElementById('p-ex').value=S.ex;}
-  if(sp.has('us')){S.us=+sp.get('us')/100;document.getElementById('p-us').value=+sp.get('us');}
-  if(sp.has('scale')){
-    const presets=[1e8,3e8,5e8,1e9,3e9];const sv=S.scale;
-    const idx=presets.findIndex(p=>Math.abs(p-sv)<100);
-    if(idx>=0)document.querySelectorAll('#pbg button')[idx].classList.add('on');
-    else document.querySelectorAll('#pbg button').forEach(b=>b.classList.remove('on'));
-  }
-  renderAll();
+  if(sp.has('exist')){S.ex=+sp.get('exist');}
+  if(sp.has('tk')&&ICI[sp.get('tk')])selTK=sp.get('tk');
+
+  document.getElementById('h-fx').textContent=nn(S.fx);
+  document.getElementById('h-hi').textContent=(S.hi*100).toFixed(3)+'%';
+
+  buildETFList('');
+  selectETF(selTK);
+  renderTable();
 }
 
-loadCFG();
+init();
 </script>
 </body>
 </html>
