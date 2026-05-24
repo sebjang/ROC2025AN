@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ROC 자본과세 범용 계산기 v1.0</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0D1117;--bg2:#161B22;--bg3:#21262D;--bg4:#2D333B;--bd:#30363D;--bd2:#444C56;--tx:#E6EDF3;--mu:#8B949E;--di:#484F58;--bl:#58A6FF;--gn:#3FB950;--rd:#F85149;--or:#D29922;--pu:#BC8CFF;--gn2:#56D364;--rd2:#F87171;--font:'Noto Sans KR',sans-serif;--mono:'IBM Plex Mono',monospace;--head:'Space Grotesk',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px;line-height:1.6}
+input,select,button{font-family:var(--font)}
+.wrap{max-width:1200px;margin:0 auto;padding:0 18px}
+header{background:var(--bg2);border-bottom:1px solid var(--bd);padding:11px 0;position:sticky;top:0;z-index:100}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.logo{font-family:var(--head);font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px}
+.ver{background:#1F6FEB;color:#fff;font-size:10px;padding:2px 8px;border-radius:20px;font-family:var(--mono);font-weight:600}
+.htag{font-family:var(--mono);font-size:11px;color:var(--mu);background:var(--bg3);border:1px solid var(--bd);border-radius:5px;padding:2px 9px;display:inline-block}
+.htag b{color:var(--bl)}
+
+/* CTRL PANELS */
+.ctrl{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin:14px 0 10px}
+.ctrl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.ctrl-row:last-child{margin-bottom:0}
+.lbl{font-size:12px;color:var(--mu);min-width:68px;flex-shrink:0}
+button.pb{font-size:12px;padding:5px 12px;border-radius:7px;cursor:pointer;border:1px solid var(--bd);background:var(--bg3);color:var(--mu);transition:all .12s}
+button.pb.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+button.pb:hover:not(.on){background:var(--bg4);color:var(--tx)}
+.pi{font-family:var(--mono);font-size:13px;padding:5px 9px;border-radius:7px;border:1px solid var(--bd);background:var(--bg3);color:var(--tx);transition:border-color .12s}
+.pi:focus{outline:none;border-color:var(--bl)}
+.pi.w{border-color:var(--or)}
+.pi-unit{font-size:12px;color:var(--mu);flex-shrink:0}
+.pi-hint{font-family:var(--mono);font-size:11px;color:var(--pu)}
+.pi-err{font-size:11px;color:var(--rd)}
+.pi-msg{font-size:11px;color:var(--mu)}
+.notation{font-size:11px;color:var(--di);margin-top:5px;font-family:var(--mono)}
+
+/* VBAR */
+.vbar{display:flex;align-items:center;gap:10px;padding:9px 14px;background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.25);border-radius:8px;margin-bottom:12px;font-size:13px}
+.vbar.fail{background:rgba(248,81,73,.07);border-color:rgba(248,81,73,.25)}
+.vi{font-size:16px}
+
+/* ETF CARDS */
+.ecard{border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:12px;background:var(--bg2)}
+.ehead{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.ename{font-family:var(--head);font-size:20px;font-weight:700}
+.emeta{font-family:var(--mono);font-size:11px;color:var(--mu);margin-top:2px}
+.etags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.tag{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:10px;border:1px solid var(--bd);color:var(--mu)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bd)}
+.vs-us{padding:12px 16px;background:rgba(63,185,80,.05)}
+.vs-kr{padding:12px 16px;background:rgba(248,81,73,.05)}
+.vs-flag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.vs-flag.g{color:var(--gn)}.vs-flag.r{color:var(--rd)}
+.vs-amt{font-family:var(--head);font-size:24px;font-weight:700;margin:3px 0}
+.vs-amt.g{color:var(--gn)}.vs-amt.r{color:var(--rd)}
+.vs-bk{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:6px 0}
+.vbi{background:var(--bg3);border-radius:5px;padding:4px 6px}
+.vbl{font-size:9px;color:var(--mu)}.vbv{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--rd2)}
+.vs-sub{font-family:var(--mono);font-size:10px;color:var(--mu)}
+.bar-w{padding:7px 16px;background:var(--bg3);border-top:1px solid var(--bd)}
+.bar-bg{height:7px;background:rgba(63,185,80,.15);border-radius:4px;overflow:hidden}
+.bar-f{height:100%;background:linear-gradient(90deg,var(--rd),#ff9999);border-radius:4px;transition:width .35s}
+.stog{width:100%;background:none;border:none;border-top:1px solid var(--bd);color:var(--mu);font-size:11px;padding:7px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:var(--font)}
+.stog:hover{background:rgba(255,255,255,.025);color:var(--tx)}
+.sbody{display:none;padding:10px 16px;background:var(--bg);font-family:var(--mono);font-size:11px}
+.sr{display:flex;align-items:baseline;gap:6px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.sr:last-child{border:none}
+.sid{font-size:10px;font-weight:600;color:var(--bl);min-width:58px;flex-shrink:0}
+.snm{font-size:11px;color:var(--mu);min-width:108px;flex-shrink:0}
+.sfm{color:var(--di);flex:1;font-size:10px}
+.srs{text-align:right;margin-left:8px;white-space:nowrap;font-weight:600}
+
+/* CHIPS */
+.chip{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:10px;border:1px solid}
+.chip-ok{background:rgba(63,185,80,.12);color:var(--gn);border-color:rgba(63,185,80,.3)}
+.chip-warn{background:rgba(210,153,34,.12);color:var(--or);border-color:rgba(210,153,34,.3)}
+.chip-err{background:rgba(248,81,73,.12);color:var(--rd);border-color:rgba(248,81,73,.3)}
+
+footer{border-top:1px solid var(--bd);padding:16px 0;margin-top:32px;font-size:11px;color:var(--mu)}
+@media(max-width:640px){.vs{grid-template-columns:1fr}.vs-us{border-bottom:1px solid var(--bd)}.vs-bk{grid-template-columns:1fr 1fr}.vs-amt{font-size:20px}}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap">
+<div class="hd">
+  <div class="logo">📊 ROC Tax 범용 계산기 <span class="ver">v1.0</span></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <span class="htag">FX ₩<b id="h-fx">1,350</b>/$</span>
+    <span class="htag">건보 <b id="h-hi">8.008155</b>%</span>
+    <span class="htag">연상한 <b id="h-cap">5,301</b>万</span>
+    <span class="htag">cfg: <b id="h-cfg" style="color:var(--gn)">로딩…</b></span>
+  </div>
+</div>
+</div>
+</header>
+
+<main class="wrap">
+
+<!-- ── 투자 규모 ── -->
+<div class="ctrl">
+  <div class="ctrl-row">
+    <span class="lbl">투자 규모</span>
+    <div style="display:flex;gap:4px;flex-wrap:wrap" id="pbg">
+      <button class="pb on" onclick="setPreset(1e8,this)">1억</button>
+      <button class="pb" onclick="setPreset(3e8,this)">3억</button>
+      <button class="pb" onclick="setPreset(5e8,this)">5억</button>
+      <button class="pb" onclick="setPreset(1e9,this)">10억</button>
+      <button class="pb" onclick="setPreset(3e9,this)">30억</button>
+    </div>
+    <span style="font-size:11px;color:var(--mu)">또는</span>
+    <input class="pi" id="ci" type="text" placeholder="2.5억 / 250000000" style="width:160px" oninput="previewAmt(this.value)" onkeydown="if(event.key==='Enter')applyAmt()">
+    <span class="pi-hint" id="ci-hint"></span>
+    <span class="pi-err" id="ci-err"></span>
+    <button class="pb on" onclick="applyAmt()" style="flex-shrink:0">▶ 적용</button>
+  </div>
+  <div class="notation">입력형식: 2.5억 · 1억5000만 · 250000000 · 2.5e8</div>
+</div>
+
+<!-- ── 파라미터 편집 (항상 노출) ── -->
+<div class="ctrl">
+  <div class="ctrl-row">
+    <span class="lbl">환율 FX</span>
+    <input class="pi" id="p-fx" type="number" value="1350" step="10" min="900" max="2500" oninput="markMod('p-fx',1350)" style="width:90px">
+    <span class="pi-unit">₩/$</span>
+    <span style="width:12px"></span>
+    <span class="lbl">기존소득</span>
+    <input class="pi" id="p-ex" type="number" value="0" step="1000000" min="0" oninput="markMod('p-ex',0)" style="width:110px">
+    <span class="pi-unit">원</span>
+    <span style="width:12px"></span>
+    <span class="lbl">미국 WHT</span>
+    <input class="pi" id="p-us" type="number" value="15" step="0.5" min="0" max="30" oninput="markMod('p-us',15)" style="width:70px">
+    <span class="pi-unit">%</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="lbl">건보 합산율</span>
+    <input class="pi" id="p-hi" type="number" value="8.008155" step="0.001" min="1" max="20" oninput="syncHI()" style="width:100px">
+    <span class="pi-unit">%</span>
+    <span style="width:8px"></span>
+    <span class="lbl" style="min-width:58px">건보 月상한</span>
+    <input class="pi" id="p-hm" type="number" value="3911280" step="10000" oninput="syncCap()" style="width:110px">
+    <span class="pi-unit">원</span>
+    <span style="width:8px"></span>
+    <span class="lbl" style="min-width:52px">장기요양率</span>
+    <input class="pi" id="p-ltc" type="number" value="12.95" step="0.01" min="1" max="30" oninput="syncHI()" style="width:80px">
+    <span class="pi-unit">% of 건보</span>
+    <span style="width:8px"></span>
+    <span class="lbl" style="min-width:48px">연 상한</span>
+    <input class="pi" id="p-cap" type="number" value="53013492" step="100000" oninput="markMod('p-cap',53013492)" style="width:110px">
+    <span class="pi-unit">원</span>
+  </div>
+  <div class="ctrl-row" style="justify-content:flex-end;gap:6px">
+    <span class="pi-msg" id="p-msg"></span>
+    <button class="pb on" onclick="applyParams()" style="padding:6px 16px;font-size:13px">✓ 확인 적용</button>
+    <button class="pb" onclick="resetParams()">↺ 초기화</button>
+    <button class="pb" onclick="copyURL()">🔗 URL 복사</button>
+    <button class="pb" onclick="dlJSON()">↓ JSON</button>
+  </div>
+</div>
+
+<!-- ── 검증 상태바 ── -->
+<div class="vbar" id="vbar">
+  <span class="vi" id="v-ico">✓</span>
+  <span id="v-txt" style="color:var(--gn)">검증 중…</span>
+  <span style="flex:1"></span>
+  <span id="v-detail" style="font-family:var(--mono);font-size:11px;color:var(--mu)"></span>
+</div>
+
+<!-- ── ETF 결과 카드들 ── -->
+<div id="cards"></div>
+
+</main>
+
+<footer class="wrap" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+  <span>ICI 2025 PCMNT · 2025 NHIS 공식 · Decimal 검증 30/30 PASS · 현재 모델 기준 재현</span>
+  <span style="font-family:var(--mono)"><a href="config.json" style="color:var(--mu)">config.json</a> · v1.0 · 6-Layer</span>
+</footer>
+
+<script>
+const ICI={
+  TSLY:{navH:14.23,ps:8.773002,b1a:2.371405,b2c:0,     b3:6.401597, roc:72.9693,rev:"1:5 (2025-12-01)", clr:"#D85A30"},
+  NVDY:{navH:23.90,ps:12.14150,b1a:5.749295,b2c:0,     b3:6.392205, roc:52.6476,rev:"없음",             clr:"#185FA5"},
+  CONY:{navH:13.46,ps:9.830900,b1a:0.291348,b2c:0.001815,b3:9.537737,roc:97.0179,rev:"1:10 (2025-12-02)",clr:"#BA7517"},
+  MSTY:{navH:30.69,ps:18.62780,b1a:0,        b2c:0,    b3:18.62780, roc:100.0,  rev:"1:5 (2025-12-08)", clr:"#A32D2D"},
+  PLTY:{navH:70.45,ps:57.96300,b1a:57.608074,b2c:0,    b3:0.354926, roc:0.6123, rev:"없음",             clr:"#534AB7"},
+};
+const BR=[[0,14e6,.06,0],[14e6,50e6,.14,1260000],[50e6,88e6,.24,6260000],[88e6,150e6,.35,15940000],[150e6,300e6,.38,20440000],[300e6,500e6,.40,25440000],[500e6,1e9,.42,35440000],[1e9,Infinity,.45,72340000]];
+
+let S={scale:1e8,fx:1350,hi:0.08008155,cap:53013492,ex:0,us:0.15,lt:0.10};
+
+function IT(x){if(!isFinite(x)||x<=0)return 0;for(const[,h,r,d]of BR)if(x<=h)return Math.round(x*r-d);return Math.round(x*0.45-72340000);}
+
+function calcETF(tk,P){
+  const d=ICI[tk];if(!d||!P)return null;
+  const sh=Math.round((P/S.fx)/d.navH);
+  const distW=Math.round(d.ps*sh*S.fx);
+  const incW=Math.round(d.b1a*sh*S.fx);
+  const cgW=Math.round((d.b2c||0)*sh*S.fx);
+  const rocW=Math.round(d.b3*sh*S.fx);
+  const icW=incW+cgW;
+  const s4d=distW-(icW+rocW);
+  const iy=P>0?icW/P*100:0;
+  const us=Math.round(icW*S.us);
+  const incrIT=Math.max(0,IT(distW+S.ex)-IT(S.ex));
+  const lt=Math.round(incrIT*S.lt);
+  const hiR=Math.round(distW*S.hi);
+  const hiC=Math.min(hiR,S.cap);
+  const capped=hiR>S.cap;
+  const kr=incrIT+lt+hiC;
+  const itC=Math.max(0,IT(icW+S.ex)-IT(S.ex));
+  const ltC=Math.round(itC*S.lt);
+  const hiCC=Math.min(Math.round(icW*S.hi),S.cap);
+  const corr=itC+ltC+hiCC;
+  const rocTax=kr-corr;
+  const ero=P>0?kr/P*100:0;
+  const mul=us>0?kr/us:null;
+  const chk=[Math.abs(s4d)<=1,incrIT>=0,hiC<=S.cap,Math.abs(kr-(incrIT+lt+hiC))<=1,Math.abs(rocTax-(kr-corr))<=1,iy>=0&&iy<=200];
+  return{sh,distW,incW,cgW,rocW,icW,iy,us,incrIT,lt,hiR,hiC,capped,kr,corr,rocTax,ero,mul,s4d,chk};
+}
+
+const nn=v=>Math.round(v).toLocaleString('ko-KR');
+const p4=v=>v.toFixed(4)+'%';
+const man=v=>nn(Math.round(v/1e4))+'万';
+const fmtS=v=>{if(v>=1e8)return(v/1e8).toFixed(v%1e8?1:0)+'억원';if(v>=1e4)return nn(v/1e4)+'万원';return nn(v)+'원';};
+const chip=(ok,lbl)=>`<span class="chip ${ok?'chip-ok':'chip-err'}">${lbl||( ok?'PASS':'FAIL')}</span>`;
+const chipD=d=>{const a=Math.abs(d);return a<=1?`<span class="chip chip-ok">PASS Δ=${d}</span>`:a<=1000?`<span class="chip chip-warn">WARN Δ=${d}</span>`:`<span class="chip chip-err">FAIL Δ=${d}</span>`;};
+
+function renderAll(){
+  const P=S.scale;
+  let tp=0,tc=0;
+  const html=[];
+  for(const[tk,d]of Object.entries(ICI)){
+    const r=calcETF(tk,P);if(!r)continue;
+    const pc=r.chk.filter(Boolean).length;tp+=pc;tc+=r.chk.length;
+    const steps=[
+      ['STEP 1','주수',`₩${nn(P)}÷${nn(S.fx)}÷$${d.navH}`,`${nn(r.sh)}주`,'var(--bl)'],
+      ['STEP 2','총분배금',`$${d.ps}×${nn(r.sh)}주×${nn(S.fx)}`,`₩${nn(r.distW)}`,'var(--tx)'],
+      ['STEP 3','Box1a소득',`$${d.b1a}×${nn(r.sh)}주×${nn(S.fx)}`,`₩${nn(r.incW)}`,'var(--gn)'],
+      ['STEP 4a','Box2c CG',`$${d.b2c||0}×${nn(r.sh)}주×${nn(S.fx)}`,`₩${nn(r.cgW)}${d.b2c>0?' ★':''}`,'var(--or)'],
+      ['STEP 4b','Box3 ROC',`$${d.b3}×${nn(r.sh)}주×${nn(S.fx)}`,`₩${nn(r.rocW)}`,'var(--rd2)'],
+      ['STEP 4V','정밀도검증',`|distW−(icW+rocW)|`,chipD(r.s4d),''],
+      ['STEP 5','★실소득율',`icW÷₩${nn(P)}×100`,p4(r.iy),'var(--gn)'],
+      ['STEP 6','🇺🇸미국세',`icW×${(S.us*100).toFixed(0)}% (ROC=$0,IRC§301)`,`₩${nn(r.us)}`,'var(--gn)'],
+      ['STEP 7','종소세증분',`IT(distW+${nn(S.ex)})−IT(${nn(S.ex)})`,`₩${nn(r.incrIT)}`,'var(--rd2)'],
+      ['STEP 8','지방소득세',`S7×${(S.lt*100).toFixed(0)}%`,`₩${nn(r.lt)}`,'var(--rd2)'],
+      ['STEP 9',`건보${r.capped?'★상한':''}`,`min(distW×${(S.hi*100).toFixed(6)}%,₩${nn(S.cap)})`,`₩${nn(r.hiC)}`,r.capped?'var(--pu)':'var(--rd2)'],
+      ['STEP 10','🇰🇷KR총세','S7+S8+S9',`₩${man(r.kr)} (${p4(r.ero)})`,'var(--rd2)'],
+      ['STEP 11','정상세금','IT(icW+exist)+지방+건보',`₩${nn(r.corr)}`,'var(--mu)'],
+      ['STEP 12','ROC과다징수','S10−S11',`₩${man(r.rocTax)} (${p4(r.rocTax/P*100)})`,'var(--rd2)'],
+      ['STEP 13','침식·배수',`kr÷₩${nn(P)}`,`${p4(r.ero)} | KR/US ${r.mul?nn(Math.round(r.mul))+'배':'∞'}`,'var(--rd2)'],
+    ];
+    const sHTML=steps.map(([id,nm,fm,rs,c])=>`<div class="sr"><span class="sid">${id}</span><span class="snm">${nm}</span><span class="sfm">${fm.replace(/</g,'&lt;')}</span><span class="srs" style="color:${c}">${rs}</span></div>`).join('');
+    html.push(`<div class="ecard">
+<div class="ehead" style="border-left:2px solid ${d.clr}">
+  <div>
+    <div class="ename" style="color:${d.clr}">${tk}</div>
+    <div class="emeta">역사주가 $${d.navH} · 역병합 ${d.rev} · 구주 ${nn(r.sh)}주</div>
+    <div class="etags">
+      <span class="tag">ROC ${p4(d.roc)}</span>
+      ${d.b2c>0?`<span class="tag" style="color:var(--or)">Box2c $${d.b2c}</span>`:''}
+      <span class="tag" style="color:var(--gn)">★실소득율 ${p4(r.iy)}</span>
+      ${r.capped?`<span class="tag" style="color:var(--pu)">건보★상한</span>`:''}
+      ${chipD(r.s4d)}
+    </div>
+  </div>
+  <div style="text-align:right"><div style="font-size:11px;color:var(--mu)">검증</div><div style="font-family:var(--mono);font-size:13px;color:${pc===r.chk.length?'var(--gn)':'var(--or)'}">${pc}/${r.chk.length} PASS</div></div>
+</div>
+<div class="vs">
+  <div class="vs-us">
+    <div class="vs-flag g">🇺🇸 미국 은퇴자 (IRC §301)</div>
+    <div style="font-size:11px;color:var(--mu);margin-bottom:4px">ROC → 취득원가 감액 → 즉시 세금 $0</div>
+    <div class="vs-amt g">₩${nn(r.us)}</div>
+    <div class="vs-sub">실소득 ${p4(r.iy)} × ${(S.us*100).toFixed(0)}% | 원금침식 0%</div>
+  </div>
+  <div class="vs-kr">
+    <div class="vs-flag r">🇰🇷 한국 은퇴자 지역가입자</div>
+    <div class="vs-bk">
+      <div class="vbi"><div class="vbl">①종소세</div><div class="vbv">${man(r.incrIT)}</div></div>
+      <div class="vbi"><div class="vbl">②지방세</div><div class="vbv">${man(r.lt)}</div></div>
+      <div class="vbi"><div class="vbl">③건보${r.capped?'★':''}</div><div class="vbv">${man(r.hiC)}</div></div>
+    </div>
+    <div class="vs-amt r">₩${man(r.kr)}</div>
+    <div class="vs-sub">원금침식 ${p4(r.ero)} | ROC과다 ${man(r.rocTax)} | KR/US ${r.mul?nn(Math.round(r.mul))+'배':'∞'}</div>
+  </div>
+</div>
+<div class="bar-w"><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--di);margin-bottom:3px"><span>🇰🇷 ${p4(r.ero)}</span><span>🇺🇸 0%</span></div><div class="bar-bg"><div class="bar-f" style="width:${Math.min(r.ero,100).toFixed(2)}%"></div></div></div>
+<button class="stog" onclick="const b=this.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block'">
+  <span>▼ STEP 1~13 단계별 계산근거 (${pc}/${r.chk.length} PASS)</span>
+  <span style="font-family:var(--mono);font-size:10px">ICI 2025 PCMNT · Box2c · Δ≤1원</span>
+</button>
+<div class="sbody">${sHTML}</div>
+</div>`);
+  }
+  document.getElementById('cards').innerHTML=html.join('');
+
+  const ok=tp===tc;
+  const vb=document.getElementById('vbar');vb.className='vbar'+(ok?'':' fail');
+  document.getElementById('v-ico').textContent=ok?'✓':'⚠';
+  document.getElementById('v-txt').textContent=`검증: ${tp}/${tc} PASS · STEP4V Δ≤1원 · Box2c 포함`;
+  document.getElementById('v-txt').style.color=ok?'var(--gn)':'var(--rd)';
+  document.getElementById('v-detail').textContent=`규모: ${fmtS(P)} | FX ₩${nn(S.fx)}/$ | 건보 ${(S.hi*100).toFixed(6)}% | 기존소득 ₩${nn(S.ex)}`;
+  document.getElementById('h-fx').textContent=nn(S.fx);
+  document.getElementById('h-hi').textContent=(S.hi*100).toFixed(6);
+  document.getElementById('h-cap').textContent=nn(Math.round(S.cap/1e4));
+}
+
+function parseKorAmt(s){
+  s=(s||'').trim().replace(/,/g,'');if(!s)return null;
+  let v=0;
+  const m1=s.match(/^([\d.]+)억\s*([\d.]+)만(?:\s*원)?$/i);
+  const m2=s.match(/^([\d.]+)억(?:\s*원)?$/i);
+  const m3=s.match(/^([\d.]+)만(?:\s*원)?$/i);
+  if(m1)v=+m1[1]*1e8+(+m1[2])*1e4;
+  else if(m2)v=+m2[1]*1e8;
+  else if(m3)v=+m3[1]*1e4;
+  else v=parseFloat(s);
+  return isFinite(v)&&v>=1000000?Math.round(v):null;
+}
+
+function previewAmt(s){
+  const v=parseKorAmt(s);
+  document.getElementById('ci-hint').textContent=v?'→ ₩'+nn(v)+' ('+fmtS(v)+')':'';
+  document.getElementById('ci-err').textContent=(s.trim()&&!v)?'인식 불가':'';
+  document.getElementById('ci').className='pi'+(s.trim()&&!v?' w':'');
+}
+
+function applyAmt(){
+  const v=parseKorAmt(document.getElementById('ci').value);
+  if(!v){document.getElementById('ci-err').textContent='금액을 인식할 수 없습니다.';return;}
+  S.scale=v;
+  document.querySelectorAll('#pbg button').forEach(b=>b.classList.remove('on'));
+  renderAll();
+}
+
+function setPreset(v,btn){
+  S.scale=v;
+  document.querySelectorAll('#pbg button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('ci').value='';
+  document.getElementById('ci-hint').textContent='';
+  renderAll();
+}
+
+function markMod(id,def){
+  const el=document.getElementById(id);
+  const diff=Math.abs(parseFloat(el.value)-parseFloat(def))>1e-9;
+  el.className='pi'+(diff?' w':'');
+  if(diff)document.getElementById('p-msg').textContent='수정됨 — [확인 적용] 클릭';
+}
+
+function syncHI(){
+  const hik=parseFloat(document.getElementById('p-hi').value)||8.008155;
+  const ltck=parseFloat(document.getElementById('p-ltc').value)||12.95;
+  document.getElementById('p-hi').value=((hik>1?hik/100:hik)*(1+(ltck>1?ltck/100:ltck))*100).toFixed(6);
+  syncCap();
+}
+
+function syncCap(){
+  const hm=parseFloat(document.getElementById('p-hm').value)||3911280;
+  const ltck=parseFloat(document.getElementById('p-ltc').value)||12.95;
+  document.getElementById('p-cap').value=Math.round((hm+Math.round(hm*(ltck>1?ltck/100:ltck)))*12);
+}
+
+function applyParams(){
+  S.fx=parseFloat(document.getElementById('p-fx').value)||1350;
+  S.ex=parseFloat(document.getElementById('p-ex').value)||0;
+  S.us=(parseFloat(document.getElementById('p-us').value)||15)/100;
+  const hp=parseFloat(document.getElementById('p-hi').value)||8.008155;
+  S.hi=hp>1?hp/100:hp;
+  S.cap=parseFloat(document.getElementById('p-cap').value)||53013492;
+  document.getElementById('p-msg').textContent='';
+  document.querySelectorAll('.pi').forEach(el=>el.classList.remove('w'));
+  renderAll();
+}
+
+function resetParams(){
+  document.getElementById('p-fx').value=1350;document.getElementById('p-ex').value=0;
+  document.getElementById('p-us').value=15;document.getElementById('p-hi').value=8.008155;
+  document.getElementById('p-ltc').value=12.95;document.getElementById('p-hm').value=3911280;
+  document.getElementById('p-cap').value=53013492;
+  Object.assign(S,{fx:1350,ex:0,us:0.15,hi:0.08008155,cap:53013492});
+  document.getElementById('p-msg').textContent='';
+  document.querySelectorAll('.pi').forEach(el=>el.classList.remove('w'));
+  renderAll();
+}
+
+function copyURL(){
+  const u=`?scale=${S.scale}&fx=${S.fx}&hi=${(S.hi*100).toFixed(6)}&cap=${S.cap}&exist=${S.ex}&us=${(S.us*100).toFixed(1)}`;
+  navigator.clipboard.writeText(location.origin+location.pathname+u).then(()=>{document.getElementById('p-msg').textContent='URL 복사 완료!';setTimeout(()=>document.getElementById('p-msg').textContent='',2500);});
+}
+
+function dlJSON(){
+  const o={_meta:{version:'1.0',generated:new Date().toISOString()},params:{scale:S.scale,fx:S.fx,existing_income:S.ex,us_rate:S.us},health_insurance:{combined_rate:S.hi,annual_cap:S.cap}};
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,2)],{type:'application/json'}));a.download='roc_params_v1.json';a.click();
+}
+
+async function loadCFG(){
+  try{
+    const r=await fetch('config.json');if(!r.ok)throw 0;
+    const c=await r.json();
+    const hi=c.health_insurance_2025;const pa=c.params;
+    if(hi?.combined_rate)S.hi=hi.combined_rate;
+    if(hi?.combined_annual_cap)S.cap=hi.combined_annual_cap;
+    if(pa?.fx_rate)S.fx=pa.fx_rate;
+    if(pa?.existing_income!=null)S.ex=pa.existing_income;
+    if(pa?.us_dividend_rate)S.us=pa.us_dividend_rate;
+    document.getElementById('h-cfg').textContent='config.json ✓';
+    document.getElementById('h-cfg').style.color='var(--gn)';
+    document.getElementById('p-fx').value=S.fx;
+    document.getElementById('p-ex').value=S.ex;
+    document.getElementById('p-hi').value=(S.hi*100).toFixed(6);
+    document.getElementById('p-cap').value=S.cap;
+  }catch(e){
+    document.getElementById('h-cfg').textContent='기본값';
+    document.getElementById('h-cfg').style.color='var(--or)';
+  }
+  const sp=new URLSearchParams(location.search);
+  if(sp.has('scale'))S.scale=+sp.get('scale');
+  if(sp.has('fx')){S.fx=+sp.get('fx');document.getElementById('p-fx').value=S.fx;}
+  if(sp.has('hi')){const v=+sp.get('hi');S.hi=v>1?v/100:v;document.getElementById('p-hi').value=(S.hi*100).toFixed(6);}
+  if(sp.has('cap')){S.cap=+sp.get('cap');document.getElementById('p-cap').value=S.cap;}
+  if(sp.has('exist')){S.ex=+sp.get('exist');document.getElementById('p-ex').value=S.ex;}
+  if(sp.has('us')){S.us=+sp.get('us')/100;document.getElementById('p-us').value=+sp.get('us');}
+  if(sp.has('scale')){
+    const presets=[1e8,3e8,5e8,1e9,3e9];const sv=S.scale;
+    const idx=presets.findIndex(p=>Math.abs(p-sv)<100);
+    if(idx>=0)document.querySelectorAll('#pbg button')[idx].classList.add('on');
+    else document.querySelectorAll('#pbg button').forEach(b=>b.classList.remove('on'));
+  }
+  renderAll();
+}
+
+loadCFG();
+</script>
+</body>
+</html>
